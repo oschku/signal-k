@@ -1,0 +1,18 @@
+[
+  {
+    "context": "vessels.self",
+    "updates": [
+      {
+        "values": [
+          {
+            "path": "",
+            "value": {
+              "uuid": "urn:mrn:signalk:uuid:b2c3d1d8-af5e-406d-b43f-cf292ab95265",
+              "name": "Quicksilver Fish 410"
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

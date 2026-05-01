@@ -1,0 +1,41 @@
+{
+  "pipedProviders": [
+    {
+      "id": "Tohatsuemulator",
+      "enabled": true,
+      "pipeElements": [
+        {
+          "type": "providers/simple",
+          "options": {
+            "logging": false,
+            "type": "NMEA0183",
+            "subOptions": {
+              "type": "tcp",
+              "host": "localhost",
+              "port": "10111"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "interfaces": {},
+  "resourcesApi": {
+    "defaultProviders": {
+      "routes": "resources-provider",
+      "waypoints": "resources-provider",
+      "notes": "resources-provider",
+      "regions": "resources-provider",
+      "charts": "resources-provider",
+      "tracks": "resources-provider",
+      "infolayers": "resources-provider",
+      "groups": "resources-provider"
+    }
+  },
+  "courseApi": {
+    "apiOnly": false
+  },
+  "security": {
+    "strategy": "./tokensecurity"
+  }
+}

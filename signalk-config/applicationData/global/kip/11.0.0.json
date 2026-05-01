@@ -1,0 +1,89 @@
+{
+  "default": {
+    "app": {
+      "configVersion": 12,
+      "autoNightMode": true,
+      "redNightMode": false,
+      "nightModeBrightness": 0.27,
+      "isRemoteControl": false,
+      "instanceName": "",
+      "dataSets": [],
+      "unitDefaults": {
+        "Unitless": "unitless",
+        "Speed": "knots",
+        "Flow": "l/h",
+        "Temperature": "celsius",
+        "Length": "m",
+        "Volume": "liter",
+        "Current": "A",
+        "Potential": "V",
+        "Charge": "C",
+        "Power": "W",
+        "Energy": "J",
+        "Pressure": "mmHg",
+        "Fuel Distance": "nm/l",
+        "Energy Distance": "nm/kWh",
+        "Density": "kg/m3",
+        "Time": "Hours",
+        "Angular Velocity": "deg/min",
+        "Angle": "deg",
+        "Frequency": "Hz",
+        "Ratio": "ratio",
+        "Resistance": "ohm"
+      },
+      "notificationConfig": {
+        "disableNotifications": false,
+        "menuGrouping": true,
+        "security": {
+          "disableSecurity": true
+        },
+        "devices": {
+          "disableDevices": false,
+          "showNormalState": false,
+          "showNominalState": false
+        },
+        "sound": {
+          "disableSound": false,
+          "muteNormal": true,
+          "muteNominal": true,
+          "muteWarn": true,
+          "muteAlert": false,
+          "muteAlarm": false,
+          "muteEmergency": false
+        }
+      },
+      "splitShellEnabled": true,
+      "splitShellSide": "left",
+      "splitShellWidth": 0.5,
+      "splitShellSwipeDisabled": false,
+      "widgetHistoryDisabled": false
+    },
+    "dashboards": [
+      {
+        "id": "ce420f59-3772-49cf-b7a5-94da6c7eaea7",
+        "name": "Dashboard 1",
+        "icon": "dashboard-dashboard",
+        "configuration": [
+          {
+            "w": 24,
+            "h": 24,
+            "id": "d1d58e6f-f8b4-4a72-9597-7f92aa6776fc",
+            "selector": "widget-host2",
+            "input": {
+              "widgetProperties": {
+                "type": "widget-tutorial",
+                "uuid": "d1d58e6f-f8b4-4a72-9597-7f92aa6776fc"
+              }
+            },
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "collapseSplitShell": false
+      }
+    ],
+    "theme": {
+      "themeName": ""
+    }
+  }
+}

@@ -1,0 +1,25 @@
+[
+  {
+    "context": "vessels.self",
+    "updates": [
+      {
+        "values": [
+          {
+            "path": "",
+            "value": {
+              "uuid": "urn:mrn:signalk:uuid:b22f9441-4434-48e7-9a4d-393606cbbd7e",
+              "name": ""
+            }
+          },
+          {
+            "path": "design.aisShipType",
+            "value": {
+              "name": "Fishing",
+              "id": 30
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

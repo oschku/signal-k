@@ -1,0 +1,78 @@
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+
+# Signal K runtime & cache
+signalk-config/.signalk/
+signalk-config/plugin-config-data/*
+!signalk-config/plugin-config-data/.gitkeep
+signalk-config/appstore/
+signalk-config/appstore-plugins/
+signalk-config/plugins/
+signalk-config/cert/
+signalk-config/security.json
+signalk-config/serverState/
+signalk-config/installed-plugins.json
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-error.log*
+lerna-debug.log*
+signalk-config/logs/
+
+# Databases & data files
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+*.wal
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+*.tmp
+
+# OS & IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.env
+.env.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# Local test data (optional — uncomment if needed)
+# test-data/
+# test-logs/
+
+# Simulation-specific
+simulator/__pycache__/
+simulator/.pytest_cache/

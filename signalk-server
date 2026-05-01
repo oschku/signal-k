@@ -1,0 +1,2 @@
+#!/bin/sh
+/home/user/.nvm/versions/node/v24.15.0/lib/node_modules/signalk-server/bin/signalk-server -c /home/user/repos/signal-k $*
