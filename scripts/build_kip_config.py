@@ -21,6 +21,11 @@ KIP_CONFIG = REPO / "signalk-config/applicationData/users/admin/kip/11.0.0.json"
 SHARED_NAME = "default"
 CONFIG_VERSION = 12
 
+# ─── NOTE ───────────────────────────────────────────────────────────────────
+# Do NOT run this script while you are experimenting with the KIP UI — it will
+# overwrite the live config file. Run it only when you want to reset back to
+# the generated baseline: python3 scripts/build_kip_config.py
+
 # Stable UUIDs so re-running produces the same file (= clean diffs)
 NS = uuid.UUID("a4d2c6ce-1f84-4b9c-8a9b-2f3e4d5a6b7c")
 def uid(*parts: str) -> str:
@@ -31,16 +36,21 @@ def uid(*parts: str) -> str:
 # baseUnit must match the Signal K SI unit so the historian stores raw values.
 # Engine paths use the .port instance (not .0) because @signalk/n2k-signalk
 # maps PGN 127488/127489 instance 0 → "port" (1 → "starboard", etc.).
-# Note: coolant arrives as `.temperature` and trim as `.drive.trimState`.
 # No depth dataset — the boat has no depth sounder.
 DATASETS = [
-    ("sog",      "self.navigation.speedOverGround",         "m/s",   "minute", 30),
-    ("rpm",      "self.propulsion.port.revolutions",        "Hz",    "minute", 30),
-    ("fuelrate", "self.propulsion.port.fuel.rate",          "m3/s",  "hour",   1),
-    ("coolant",  "self.propulsion.port.temperature",        "K",     "minute", 30),
-    ("voltage",  "self.electrical.batteries.0.voltage",     "V",     "minute", 30),
-    ("slip",     "self.propulsion.port.slip",               "ratio", "minute", 30),
-    ("fuelrem",  "self.tanks.fuel.0.currentLevel",          "ratio", "hour",   2),
+    # Navigation
+    ("sog",             "self.navigation.speedOverGround",           "m/s",   "minute", 30),
+    # Engine
+    ("rpm",             "self.propulsion.port.revolutions",          "Hz",    "minute", 30),
+    ("fuelrate",        "self.propulsion.port.fuel.rate",            "m3/s",  "hour",   1),
+    ("coolant",         "self.propulsion.port.temperature",          "K",     "minute", 30),
+    ("slip",            "self.propulsion.port.slip",                 "ratio", "minute", 30),
+    # Electrical
+    ("voltage",         "self.electrical.batteries.0.voltage",       "V",     "minute", 30),
+    # Fuel monitor derived — needed by Statistics charts
+    ("fuelrem",         "self.tanks.fuel.0.currentLevel",            "ratio", "hour",   2),
+    ("economy",         "self.tanks.fuel.0.distancePerFuel",         "m/m3",  "minute", 30),
+    ("timerange",       "self.tanks.fuel.0.timeRange",               "s",     "minute", 30),
 ]
 
 
@@ -386,57 +396,62 @@ def w_button(slug, x, y, w, h, *, name, path, color="green", on_value=True,
     }
 
 
-# Layouts assume a 24-column grid. The MFS30D has no depth sounder and no
-# fuel-tank sender, so depth is omitted everywhere and fuel level comes from
-# the signalk-fuel-monitor plugin (rate-integrated, refillable via PUT).
+# ─── Grid: 24 columns, variable height rows ──────────────────────────────
+# No depth sounder. Fuel level from signalk-fuel-monitor (rate-integrated).
+# Position from FZ-G1 u-blox GPS via Windows OS location service.
 
-# ─── Dashboard 1: Underway (cruising) ─────────────────────────────────────
-underway_widgets = [
-    # Top half: big RPM gauge | SOG | Slip
-    w_radial("u_rpm", 0, 0, 12, 12,
+# ═══════════════════════════════════════════════════════════════════════════
+# Dashboard 1 — Cruising
+# Goal: everything needed at planing speed in one glance.
+# ═══════════════════════════════════════════════════════════════════════════
+cruising_widgets = [
+    # ── Row 0-11 ── RPM radial (hero) | SOG | Coolant
+    w_radial("c_rpm", 0, 0, 12, 12,
              name="RPM", path="self.propulsion.port.revolutions", unit="RPM",
              lower=0, upper=7000, decimals=0, color="yellow",
              subtype="measuring", scale_start=180, sk_unit_filter="Hz"),
-    w_numeric("u_sog", 12, 0, 12, 6,
-              name="SOG", path="self.navigation.speedOverGround", unit="knots",
-              decimals=1, minichart=True, color="blue", y_min=0, y_max=25),
-    w_numeric("u_slip", 12, 6, 12, 6,
-              name="Prop Slip", path="self.propulsion.port.slip",
-              unit="%", decimals=0, minichart=True, color="purple",
-              y_min=0, y_max=100),
-
-    # Mid section: fuel + coolant + voltage
-    w_simple_linear("u_fuel", 0, 12, 8, 8,
-                    name="Fuel Level", path="self.tanks.fuel.0.currentLevel",
-                    unit="%", lower=0, upper=100, decimals=0, color="green"),
-    w_numeric("u_coolant", 8, 12, 8, 8,
+    w_numeric("c_sog", 12, 0, 12, 6,
+              name="SOG", path="self.navigation.speedOverGround",
+              unit="knots", decimals=1, minichart=True, color="blue",
+              y_min=0, y_max=30),
+    w_numeric("c_coolant", 12, 6, 12, 6,
               name="Coolant", path="self.propulsion.port.temperature",
               unit="celsius", decimals=0, minichart=True, color="orange",
               y_min=0, y_max=110),
-    w_simple_linear("u_voltage", 16, 12, 8, 8,
+
+    # ── Row 12-19 ── Fuel bar | Voltage bar | Time remaining
+    w_simple_linear("c_fuel", 0, 12, 8, 8,
+                    name="Fuel Level", path="self.tanks.fuel.0.currentLevel",
+                    unit="%", lower=0, upper=100, decimals=0, color="green"),
+    w_simple_linear("c_voltage", 8, 12, 8, 8,
                     name="Voltage", path="self.electrical.batteries.0.voltage",
                     unit="V", lower=10, upper=15, decimals=2, color="green"),
+    w_numeric("c_timerange", 16, 12, 8, 8,
+              name="Fuel Hours", path="self.tanks.fuel.0.timeRange",
+              unit="Hours", decimals=1, minichart=True, color="green",
+              y_min=0, y_max=5),
 
-    # Bottom strip: trim, hours, fuel rate, refill button
-    w_numeric("u_trim", 0, 20, 6, 4,
-              name="Trim", path="self.propulsion.port.drive.trimState", unit="%",
-              decimals=0, color="contrast", y_min=0, y_max=100),
-    w_numeric("u_hours", 6, 20, 6, 4,
-              name="Engine Hours", path="self.propulsion.port.runTime",
+    # ── Row 20-23 ── Trim | Engine hours | Fuel rate | Refilled button
+    w_numeric("c_trim", 0, 20, 6, 4,
+              name="Trim", path="self.propulsion.port.drive.trimState",
+              unit="%", decimals=0, color="contrast", y_min=0, y_max=100),
+    w_numeric("c_hours", 6, 20, 6, 4,
+              name="Hours", path="self.propulsion.port.runTime",
               unit="Hours", decimals=1, color="contrast"),
-    w_numeric("u_fuelrate", 12, 20, 6, 4,
+    w_numeric("c_fuelrate", 12, 20, 6, 4,
               name="Fuel Rate", path="self.propulsion.port.fuel.rate",
-              unit="l/h", decimals=2, color="orange"),
-    w_button("u_refill", 18, 20, 6, 4,
+              unit="l/h", decimals=1, color="orange"),
+    w_button("c_refill", 18, 20, 6, 4,
              name="Refilled (25 L)", path="self.tanks.fuel.0.refill",
              color="green"),
 ]
 
-# ─── Dashboard 2: Trolling (low-speed fishing) ────────────────────────────
-# No depth sounder on the boat — the trolling dashboard is built around
-# precise speed control, course, and position rather than bottom following.
+# ═══════════════════════════════════════════════════════════════════════════
+# Dashboard 2 — Trolling
+# Goal: precise lure-speed control; keep COG and position accessible.
+# ═══════════════════════════════════════════════════════════════════════════
 trolling_widgets = [
-    # Trolling speed needs visible-from-the-rod-holder size and 1-decimal precision
+    # ── Row 0-11 ── Big SOG (visible from the stern) | COG compass
     w_numeric("t_sog", 0, 0, 14, 12,
               name="Trolling Speed", path="self.navigation.speedOverGround",
               unit="knots", decimals=1, minichart=True, color="blue",
@@ -445,112 +460,101 @@ trolling_widgets = [
               name="COG", path="self.navigation.courseOverGroundTrue",
               color="purple"),
 
-    # SOG history shows trolling consistency — the lure is happiest at a steady speed
+    # ── Row 12-19 ── Speed consistency chart | Position
+    # Flat SOG line = consistent lure depth.
     w_chart("t_sog_chart", 0, 12, 14, 8,
-            name="Trolling Speed (10 min)",
+            name="Speed (10 min)",
             path="self.navigation.speedOverGround",
             convert_unit="knots", period=10, scale="minute", color="blue",
-            y_min=0, y_max=10),
+            y_min=0, y_max=8),
     w_position("t_pos", 14, 12, 10, 8, name="Position"),
 
-    # Quick reference strip
-    w_numeric("t_rpm", 0, 20, 8, 4,
+    # ── Row 20-23 ── RPM | Trim | Fuel % | Distance remaining
+    w_numeric("t_rpm", 0, 20, 6, 4,
               name="RPM", path="self.propulsion.port.revolutions",
-              unit="RPM", decimals=0, color="yellow",
-              y_min=0, y_max=7000),
-    w_numeric("t_trim", 8, 20, 8, 4,
+              unit="RPM", decimals=0, color="yellow", y_min=0, y_max=7000),
+    w_numeric("t_trim", 6, 20, 6, 4,
               name="Trim", path="self.propulsion.port.drive.trimState",
               unit="%", decimals=0, color="contrast", y_min=0, y_max=100),
-    w_numeric("t_fuelrem", 16, 20, 8, 4,
+    w_numeric("t_fuelrem", 12, 20, 6, 4,
               name="Fuel %", path="self.tanks.fuel.0.currentLevel",
               unit="%", decimals=0, color="green", y_min=0, y_max=100),
+    w_numeric("t_distrange", 18, 20, 6, 4,
+              name="Range", path="self.tanks.fuel.0.distanceRange",
+              unit="nm", decimals=1, color="green", y_min=0, y_max=100),
 ]
 
-# ─── Dashboard 3: Navigation ───────────────────────────────────────────────
-# Position comes from the FZ-G1's built-in u-blox GPS via the OS sensor stack.
-nav_widgets = [
-    # Big compass for COG
-    w_compass("n_cog", 0, 0, 12, 12,
-              name="COG", path="self.navigation.courseOverGroundTrue",
-              color="purple"),
-    w_numeric("n_sog", 12, 0, 12, 6,
-              name="SOG", path="self.navigation.speedOverGround",
-              unit="knots", decimals=1, minichart=True, color="blue",
-              y_min=0, y_max=25),
-    w_position("n_pos", 12, 6, 12, 6, name="Position"),
-
-    # Speed history over a longer window to see passage progress
-    w_chart("n_sog_chart", 0, 12, 24, 8,
-            name="Speed Over Ground (30 min)",
-            path="self.navigation.speedOverGround",
-            convert_unit="knots", period=30, scale="minute", color="blue",
-            y_min=0, y_max=25),
-
-    # Bottom strip — clock, voltage (was depth), heading
-    w_datetime("n_clock", 0, 20, 8, 4, name="Local Time", fmt="HH:mm:ss",
-               tz="Europe/Helsinki", color="contrast"),
-    w_numeric("n_voltage", 8, 20, 8, 4,
-              name="Voltage", path="self.electrical.batteries.0.voltage",
-              unit="V", decimals=2, color="green", y_min=10, y_max=15),
-    w_numeric("n_heading", 16, 20, 8, 4,
-              name="COG (deg)", path="self.navigation.courseOverGroundTrue",
-              unit="deg", decimals=0, color="purple",
-              sk_unit_filter="rad", y_min=0, y_max=360),
-]
-
-# ─── Dashboard 4: Engine Detail (diagnostics + slippage) ──────────────────
-engine_widgets = [
-    # Slippage hero — only meaningful when running, alarms above ~40%
-    w_numeric("e_slip", 0, 0, 12, 8,
+# ═══════════════════════════════════════════════════════════════════════════
+# Dashboard 3 — Statistics
+# Goal: efficiency and trend analysis — slippage, fuel economy, history.
+#
+# Fuel economy display:
+#   distancePerFuel (m/m³)  → KIP "Fuel Distance" → nm/L  (higher = better)
+#   fuelPerDistance (m³/m)  — raw SI, multiply × 1,852,000 for L/nm
+#   Both are shown as charts to reveal trends. The nm/L numeric is the hero.
+# ═══════════════════════════════════════════════════════════════════════════
+stats_widgets = [
+    # ── Row 0-7 ── Slip hero | Economy (nm/L) hero
+    w_numeric("s_slip", 0, 0, 12, 8,
               name="Prop Slip", path="self.propulsion.port.slip",
               unit="%", decimals=0, minichart=True, color="purple",
               show_min_max=True, y_min=0, y_max=100),
-    w_chart("e_slip_chart", 12, 0, 12, 8,
-            name="Slip vs Theoretical (30 min)",
+    w_numeric("s_economy", 12, 0, 12, 8,
+              name="Economy (nm/L)", path="self.tanks.fuel.0.distancePerFuel",
+              unit="nm/l", decimals=2, minichart=True, color="green",
+              y_min=0, y_max=5),
+
+    # ── Row 8-15 ── Slip chart | Fuel-rate chart | Coolant chart
+    w_chart("s_slip_chart", 0, 8, 8, 8,
+            name="Slip % (30 min)",
             path="self.propulsion.port.slip",
             convert_unit="%", period=30, scale="minute", color="purple",
             y_min=0, y_max=100),
-
-    # History grid: RPM, fuel rate, coolant
-    w_chart("e_rpm_chart", 0, 8, 8, 8,
-            name="RPM (30 min)",
-            path="self.propulsion.port.revolutions",
-            convert_unit="RPM", period=30, scale="minute", color="yellow",
-            y_min=0, y_max=7000),
-    w_chart("e_fuelrate_chart", 8, 8, 8, 8,
+    w_chart("s_fuelrate_chart", 8, 8, 8, 8,
             name="Fuel Rate (60 min)",
             path="self.propulsion.port.fuel.rate",
             convert_unit="l/h", period=1, scale="hour", color="orange",
             y_min=0, y_max=15),
-    w_chart("e_coolant_chart", 16, 8, 8, 8,
+    w_chart("s_coolant_chart", 16, 8, 8, 8,
             name="Coolant °C (30 min)",
             path="self.propulsion.port.temperature",
             convert_unit="celsius", period=30, scale="minute", color="orange",
             y_min=0, y_max=110),
 
-    # Bottom diagnostic strip
-    w_simple_linear("e_voltage", 0, 16, 6, 8,
-                    name="Voltage", path="self.electrical.batteries.0.voltage",
-                    unit="V", lower=10, upper=15, decimals=2, color="green"),
-    w_numeric("e_trim", 6, 16, 6, 8,
-              name="Trim", path="self.propulsion.port.drive.trimState", unit="%",
-              decimals=0, color="contrast", y_min=0, y_max=100),
-    w_numeric("e_hours", 12, 16, 6, 8,
-              name="Hours", path="self.propulsion.port.runTime",
-              unit="Hours", decimals=1, color="contrast"),
-    w_numeric("e_fuelrem", 18, 16, 6, 8,
-              name="Fuel L", path="self.tanks.fuel.0.currentLevel",
-              unit="liter", decimals=1, color="green"),
+    # ── Row 16-23 ── SOG chart | RPM chart | 4 key numbers
+    w_chart("s_sog_chart", 0, 16, 8, 8,
+            name="SOG (30 min)",
+            path="self.navigation.speedOverGround",
+            convert_unit="knots", period=30, scale="minute", color="blue",
+            y_min=0, y_max=30),
+    w_chart("s_rpm_chart", 8, 16, 8, 8,
+            name="RPM (30 min)",
+            path="self.propulsion.port.revolutions",
+            convert_unit="RPM", period=30, scale="minute", color="yellow",
+            y_min=0, y_max=7000),
+    # Right column: 4 compact numerics giving the current balance sheet
+    w_numeric("s_timerange", 16, 16, 4, 4,
+              name="Time Left", path="self.tanks.fuel.0.timeRange",
+              unit="Hours", decimals=1, color="green", y_min=0, y_max=5),
+    w_numeric("s_distrange", 20, 16, 4, 4,
+              name="Range", path="self.tanks.fuel.0.distanceRange",
+              unit="nm", decimals=1, color="green", y_min=0, y_max=100),
+    w_numeric("s_fuelvol", 16, 20, 4, 4,
+              name="Fuel L", path="self.tanks.fuel.0.currentVolume",
+              unit="liter", decimals=1, color="green", y_min=0, y_max=25),
+    w_numeric("s_hours", 20, 20, 4, 4,
+              name="Eng Hours", path="self.propulsion.port.runTime",
+              unit="Hours", decimals=0, color="contrast"),
 ]
 
 
-def dashboard(slug, name, icon, widgets):
+def dashboard(slug, name, icon, widgets, collapse=False):
     return {
         "id": uid("dash", slug),
         "name": name,
         "icon": icon,
         "configuration": widgets,
-        "collapseSplitShell": False,
+        "collapseSplitShell": collapse,
     }
 
 
@@ -558,9 +562,6 @@ config = {
     SHARED_NAME: {
         "app": {
             "configVersion": CONFIG_VERSION,
-            # Manual day/night toggle stays available in KIP's top bar.
-            # autoNightMode flips at sunset/sunrise; redNightMode adds the
-            # red filter on top of night theme (preserves dark-adapted vision).
             "autoNightMode": True,
             "redNightMode": False,
             "nightModeBrightness": 0.27,
@@ -573,7 +574,7 @@ config = {
                 "Speed": "knots",
                 "Flow": "l/h",
                 "Temperature": "celsius",
-                "Length": "m",
+                "Length": "nm",         # nm preferred for range distances
                 "Volume": "liter",
                 "Current": "A",
                 "Potential": "V",
@@ -618,10 +619,9 @@ config = {
         },
         "theme": {"themeName": ""},
         "dashboards": [
-            dashboard("underway", "Underway",   "dashboard-dashboard", underway_widgets),
-            dashboard("trolling", "Trolling",   "dashboard-map",       trolling_widgets),
-            dashboard("nav",      "Navigation", "dashboard-sailing",   nav_widgets),
-            dashboard("engine",   "Engine",     "dashboard-dashboard", engine_widgets),
+            dashboard("cruising",    "Cruising",    "dashboard-dashboard", cruising_widgets),
+            dashboard("trolling",    "Trolling",    "dashboard-map",       trolling_widgets),
+            dashboard("statistics",  "Statistics",  "dashboard-sailing",   stats_widgets),
         ],
     }
 }
