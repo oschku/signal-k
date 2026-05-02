@@ -17,7 +17,7 @@ import uuid
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
-KIP_CONFIG = REPO / "signalk-config/applicationData/users/admin/kip/11.0.0.json"
+KIP_CONFIG = REPO / "signalk-config/applicationData/users/panasonic/kip/11.0.0.json"
 SHARED_NAME = "default"
 CONFIG_VERSION = 12
 

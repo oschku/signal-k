@@ -175,7 +175,7 @@ class BoatSim:
         else:
             rpm = 1000
 
-        fuel_rate_lph = 0.04 + 0.000000035 * (rpm ** 2.7)
+        fuel_rate_lph = 0.4 + 0.000125 * (rpm ** 1.3) # 0.5 L/h at idle, 10.5 L/h at WOT
 
         # Coolant: exponential approach to a load-dependent equilibrium.
         # Each 1-second tick: T += (T_eq - T) × (1 − e^(−dt/τ))
@@ -188,7 +188,7 @@ class BoatSim:
         trim_pct = 35 + 10 * math.sin(self.t / 60)
         voltage = 14.2 if rpm > 800 else 12.6
 
-        sog_knots = max(0, (rpm - 1200) / 250)
+        sog_knots = max(0, (rpm - 900) / 200)
         sog_ms = sog_knots * 0.5144
 
         self.lat += (sog_ms * math.cos(math.radians(self.heading_deg))) / 111000

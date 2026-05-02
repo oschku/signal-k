@@ -1,110 +1,4 @@
 {
-  "panasonic": {
-    "app": {
-      "autoNightMode": false,
-      "redNightMode": false,
-      "nightModeBrightness": 1,
-      "isRemoteControl": false,
-      "instanceName": "",
-      "dataSets": [],
-      "unitDefaults": {},
-      "notificationConfig": {
-        "disableNotifications": false,
-        "menuGrouping": true,
-        "security": {
-          "disableSecurity": true
-        },
-        "devices": {
-          "disableDevices": false,
-          "showNormalState": false,
-          "showNominalState": false
-        },
-        "sound": {
-          "disableSound": false,
-          "muteNormal": true,
-          "muteNominal": true,
-          "muteWarn": true,
-          "muteAlert": false,
-          "muteAlarm": false,
-          "muteEmergency": false
-        }
-      },
-      "splitShellEnabled": false,
-      "splitShellSide": "left",
-      "splitShellWidth": 0.5,
-      "splitShellSwipeDisabled": false,
-      "widgetHistoryDisabled": false
-    },
-    "dashboards": [
-      {
-        "id": "bbef5402-dedb-4821-b922-326688296702",
-        "name": "Dashboard 1",
-        "icon": "dashboard-dashboard",
-        "configuration": [
-          {
-            "x": 0,
-            "y": 0,
-            "w": 10,
-            "h": 16,
-            "minW": 1,
-            "minH": 2,
-            "id": "16d23086-1b98-4703-9eb3-99a7fe465226",
-            "selector": "widget-host2",
-            "input": {
-              "widgetProperties": {
-                "type": "widget-gauge-ng-radial",
-                "uuid": "16d23086-1b98-4703-9eb3-99a7fe465226",
-                "config": {
-                  "supportAutomaticHistoricalSeries": true,
-                  "displayName": "Tach",
-                  "filterSelfPaths": true,
-                  "paths": {
-                    "gaugePath": {
-                      "description": "Numeric Data",
-                      "path": "self.propulsion.port.revolutions",
-                      "source": "default",
-                      "pathType": "number",
-                      "suppressBootstrapNull": true,
-                      "isPathConfigurable": true,
-                      "showPathSkUnitsFilter": true,
-                      "pathSkUnitsFilter": null,
-                      "convertUnitTo": "rpm",
-                      "sampleTime": 500
-                    }
-                  },
-                  "displayScale": {
-                    "lower": 0,
-                    "upper": 7000,
-                    "type": "linear"
-                  },
-                  "gauge": {
-                    "type": "ngRadial",
-                    "subType": "measuring",
-                    "highlightsWidth": 5,
-                    "scaleStart": 180,
-                    "barStartPosition": "left",
-                    "enableTicks": true,
-                    "enableProgressbar": true,
-                    "enableNeedle": true
-                  },
-                  "numInt": 1,
-                  "numDecimal": 0,
-                  "enableTimeout": false,
-                  "color": "orange",
-                  "dataTimeout": 5,
-                  "ignoreZones": false
-                }
-              }
-            }
-          }
-        ],
-        "collapseSplitShell": false
-      }
-    ],
-    "theme": {
-      "themeName": ""
-    }
-  },
   "default": {
     "app": {
       "configVersion": 12,
@@ -115,23 +9,83 @@
       "instanceName": "",
       "dataSets": [
         {
-          "uuid": "8d69fe23-c9ae-5b2e-9bb9-92e83f3f064e",
-          "path": "self.environment.depth.belowTransducer",
+          "uuid": "fb9f2024-3444-5142-900c-c9aa7bf5c7d4",
+          "path": "self.navigation.speedOverGround",
           "pathSource": "default",
-          "baseUnit": null,
+          "baseUnit": "m/s",
           "timeScaleFormat": "minute",
-          "period": 0.2,
-          "label": "simple-chart-8d69fe23-c9ae-5b2e-9bb9-92e83f3f064e",
+          "period": 10,
+          "label": "self.navigation.speedOverGround|knots|default|minute|10",
           "editable": false
         },
         {
-          "uuid": "fab33c8b-b5d8-5e12-86f2-fff51884e540",
-          "path": "self.environment.depth.belowTransducer",
+          "uuid": "c1c47638-03a3-5fe1-ad95-97f01fa569ad",
+          "path": "self.propulsion.port.slip",
           "pathSource": "default",
-          "baseUnit": null,
+          "baseUnit": "ratio",
           "timeScaleFormat": "minute",
-          "period": 10,
-          "label": "self.environment.depth.belowTransducer|m|default|minute|10",
+          "period": 0.2,
+          "label": "simple-chart-c1c47638-03a3-5fe1-ad95-97f01fa569ad",
+          "editable": false
+        },
+        {
+          "uuid": "817ae746-b672-5ff2-a3e3-f20bc157db25",
+          "path": "self.tanks.fuel.0.distancePerFuel",
+          "pathSource": "default",
+          "baseUnit": "m/m3",
+          "timeScaleFormat": "minute",
+          "period": 0.2,
+          "label": "simple-chart-817ae746-b672-5ff2-a3e3-f20bc157db25",
+          "editable": false
+        },
+        {
+          "uuid": "bf00ace2-f199-5f86-bcb9-28c254ac07ef",
+          "path": "self.propulsion.port.slip",
+          "pathSource": "default",
+          "baseUnit": "ratio",
+          "timeScaleFormat": "minute",
+          "period": 30,
+          "label": "self.propulsion.port.slip|percent|default|minute|30",
+          "editable": false
+        },
+        {
+          "uuid": "2cce09f4-00c9-5bbb-81b7-eab991f49adb",
+          "path": "self.propulsion.port.fuel.rate",
+          "pathSource": "default",
+          "baseUnit": "m3/s",
+          "timeScaleFormat": "hour",
+          "period": 1,
+          "label": "self.propulsion.port.fuel.rate|l/h|default|hour|1",
+          "editable": false
+        },
+        {
+          "uuid": "c8804b7c-438e-54a6-9136-fc84a4c5ed8a",
+          "path": "self.propulsion.port.temperature",
+          "pathSource": "default",
+          "baseUnit": "K",
+          "timeScaleFormat": "minute",
+          "period": 30,
+          "label": "self.propulsion.port.temperature|celsius|default|minute|30",
+          "editable": false
+        },
+        {
+          "uuid": "aa147b10-bff7-5b09-a8f5-8e94c6ad0bf9",
+          "path": "self.navigation.speedOverGround",
+          "pathSource": "default",
+          "baseUnit": "m/s",
+          "timeScaleFormat": "minute",
+          "period": 30,
+          "label": "self.navigation.speedOverGround|knots|default|minute|30",
+          "editable": false
+        },
+        {
+          "uuid": "cbf852d9-947f-5f2e-bec6-289e5376e352",
+          "path": "self.propulsion.port.revolutions",
+          "pathSource": "default",
+          "baseUnit": "Hz",
+          "timeScaleFormat": "minute",
+          "period": 30,
+          "label": "self.propulsion.port.revolutions|rpm|default|minute|30",
           "editable": false
         }
       ],
@@ -140,7 +94,7 @@
         "Speed": "knots",
         "Flow": "l/h",
         "Temperature": "celsius",
-        "Length": "m",
+        "Length": "nm",
         "Volume": "liter",
         "Current": "A",
         "Potential": "V",
@@ -183,38 +137,43 @@
       "splitShellSide": "left",
       "splitShellWidth": 0.5,
       "splitShellSwipeDisabled": false,
-      "widgetHistoryDisabled": true
+      "widgetHistoryDisabled": false
+    },
+    "theme": {
+      "themeName": ""
     },
     "dashboards": [
       {
-        "id": "774c166f-f3f8-507e-8476-58c7ca34c164",
-        "name": "Underway",
+        "id": "4f513fe7-41e3-564f-8b8e-425e56774bce",
+        "name": "Cruising",
         "icon": "dashboard-dashboard",
         "configuration": [
           {
             "x": 0,
             "y": 0,
-            "w": 12,
-            "h": 12,
-            "id": "cee9910d-76b0-5430-8548-97823fbd80af",
+            "w": 13,
+            "h": 17,
+            "id": "a8880e72-4f84-5126-92c1-7ad925b33edd",
             "selector": "widget-host2",
             "input": {
               "widgetProperties": {
                 "type": "widget-gauge-ng-radial",
-                "uuid": "cee9910d-76b0-5430-8548-97823fbd80af",
+                "uuid": "a8880e72-4f84-5126-92c1-7ad925b33edd",
                 "config": {
+                  "supportAutomaticHistoricalSeries": true,
                   "displayName": "RPM",
                   "filterSelfPaths": true,
                   "paths": {
                     "gaugePath": {
                       "description": "Numeric Data",
-                      "path": "self.propulsion.0.revolutions",
+                      "path": "self.propulsion.port.revolutions",
                       "source": "default",
                       "pathType": "number",
+                      "suppressBootstrapNull": true,
                       "isPathConfigurable": true,
                       "showPathSkUnitsFilter": true,
                       "pathSkUnitsFilter": "Hz",
-                      "convertUnitTo": "RPM",
+                      "convertUnitTo": "rpm",
                       "sampleTime": 500
                     }
                   },
@@ -226,36 +185,39 @@
                   "gauge": {
                     "type": "ngRadial",
                     "subType": "measuring",
-                    "enableTicks": true,
-                    "enableNeedle": true,
-                    "enableProgressbar": true,
                     "highlightsWidth": 5,
                     "scaleStart": 180,
-                    "barStartPosition": "left"
+                    "barStartPosition": "left",
+                    "enableTicks": true,
+                    "enableProgressbar": true,
+                    "enableNeedle": true
                   },
                   "numInt": 1,
                   "numDecimal": 0,
                   "enableTimeout": false,
                   "color": "yellow",
                   "dataTimeout": 5,
-                  "ignoreZones": false
+                  "ignoreZones": true
                 }
               }
             }
           },
           {
-            "x": 12,
+            "x": 13,
             "y": 0,
-            "w": 12,
-            "h": 6,
-            "id": "e906001d-7d9f-599e-9a39-89a8ec5fe6b0",
+            "w": 8,
+            "h": 15,
+            "minW": 1,
+            "minH": 2,
+            "id": "d6a88b94-4bb5-4628-a9bb-23beea07a4e5",
             "selector": "widget-host2",
             "input": {
               "widgetProperties": {
                 "type": "widget-numeric",
-                "uuid": "e906001d-7d9f-599e-9a39-89a8ec5fe6b0",
+                "uuid": "d6a88b94-4bb5-4628-a9bb-23beea07a4e5",
                 "config": {
-                  "displayName": "SOG",
+                  "supportAutomaticHistoricalSeries": true,
+                  "displayName": "Speed",
                   "filterSelfPaths": true,
                   "paths": {
                     "numericPath": {
@@ -263,19 +225,20 @@
                       "path": "self.navigation.speedOverGround",
                       "source": "default",
                       "pathType": "number",
+                      "suppressBootstrapNull": true,
                       "isPathConfigurable": true,
                       "convertUnitTo": "knots",
                       "showPathSkUnitsFilter": true,
                       "pathSkUnitsFilter": null,
-                      "sampleTime": 500
+                      "sampleTime": 200
                     }
                   },
-                  "showMax": false,
+                  "showMax": true,
                   "showMin": false,
                   "numDecimal": 1,
-                  "showMiniChart": true,
+                  "showMiniChart": false,
                   "yScaleMin": 0,
-                  "yScaleMax": 25,
+                  "yScaleMax": 24,
                   "inverseYAxis": false,
                   "verticalChart": false,
                   "color": "blue",
@@ -287,27 +250,82 @@
             }
           },
           {
-            "x": 12,
-            "y": 6,
-            "w": 12,
-            "h": 6,
-            "id": "1a994401-5e00-574d-a9be-2aee41a84590",
+            "x": 21,
+            "y": 0,
+            "w": 3,
+            "h": 20,
+            "minW": 1,
+            "minH": 2,
+            "id": "aa64fb5f-9908-4341-ba38-7c7073ca543a",
+            "selector": "widget-host2",
+            "input": {
+              "widgetProperties": {
+                "type": "widget-gauge-ng-linear",
+                "uuid": "aa64fb5f-9908-4341-ba38-7c7073ca543a",
+                "config": {
+                  "supportAutomaticHistoricalSeries": true,
+                  "displayName": "Trim",
+                  "filterSelfPaths": true,
+                  "paths": {
+                    "gaugePath": {
+                      "description": "Numeric Data",
+                      "path": "self.propulsion.port.drive.trimState",
+                      "source": "default",
+                      "pathType": "number",
+                      "suppressBootstrapNull": true,
+                      "isPathConfigurable": true,
+                      "showPathSkUnitsFilter": true,
+                      "pathSkUnitsFilter": null,
+                      "convertUnitTo": "ratio",
+                      "sampleTime": 200
+                    }
+                  },
+                  "displayScale": {
+                    "lower": 0,
+                    "upper": 1,
+                    "type": "linear"
+                  },
+                  "gauge": {
+                    "type": "ngLinear",
+                    "subType": "vertical",
+                    "highlightsWidth": 20,
+                    "enableTicks": false,
+                    "enableNeedle": true
+                  },
+                  "numInt": 1,
+                  "numDecimal": 2,
+                  "color": "grey",
+                  "enableTimeout": false,
+                  "dataTimeout": 5,
+                  "ignoreZones": false
+                }
+              }
+            }
+          },
+          {
+            "x": 13,
+            "y": 15,
+            "w": 8,
+            "h": 5,
+            "id": "1ab6cbd9-4713-578c-86fd-e6f17cdf9700",
             "selector": "widget-host2",
             "input": {
               "widgetProperties": {
                 "type": "widget-numeric",
-                "uuid": "1a994401-5e00-574d-a9be-2aee41a84590",
+                "uuid": "1ab6cbd9-4713-578c-86fd-e6f17cdf9700",
                 "config": {
-                  "displayName": "Depth",
+                  "supportAutomaticHistoricalSeries": true,
+                  "displayName": "Fuel Hours",
                   "filterSelfPaths": true,
                   "paths": {
                     "numericPath": {
                       "description": "Numeric Data",
-                      "path": "self.environment.depth.belowTransducer",
+                      "path": "self.tanks.fuel.0.timeRange",
                       "source": "default",
                       "pathType": "number",
+                      "suppressBootstrapNull": true,
                       "isPathConfigurable": true,
-                      "convertUnitTo": "m",
+                      "convertUnitTo": "Hours",
                       "showPathSkUnitsFilter": true,
                       "pathSkUnitsFilter": null,
                       "sampleTime": 500
@@ -318,10 +336,10 @@
                   "numDecimal": 1,
                   "showMiniChart": true,
                   "yScaleMin": 0,
-                  "yScaleMax": 30,
+                  "yScaleMax": 5,
                   "inverseYAxis": false,
                   "verticalChart": false,
-                  "color": "contrast",
+                  "color": "green",
                   "enableTimeout": false,
                   "dataTimeout": 5,
                   "ignoreZones": false
@@ -331,16 +349,17 @@
           },
           {
             "x": 0,
-            "y": 12,
-            "w": 8,
-            "h": 8,
-            "id": "36e253bf-8608-5e6a-b101-2fc9947239a1",
+            "y": 17,
+            "w": 7,
+            "h": 3,
+            "id": "cb1f9681-ca76-57db-8885-b00640f4081e",
             "selector": "widget-host2",
             "input": {
               "widgetProperties": {
                 "type": "widget-simple-linear",
-                "uuid": "36e253bf-8608-5e6a-b101-2fc9947239a1",
+                "uuid": "cb1f9681-ca76-57db-8885-b00640f4081e",
                 "config": {
+                  "supportAutomaticHistoricalSeries": true,
                   "displayName": "Fuel Level",
                   "filterSelfPaths": true,
                   "paths": {
@@ -352,7 +371,7 @@
                       "isPathConfigurable": true,
                       "showPathSkUnitsFilter": true,
                       "pathSkUnitsFilter": null,
-                      "convertUnitTo": "%",
+                      "convertUnitTo": "percent",
                       "sampleTime": 500
                     }
                   },
@@ -367,7 +386,7 @@
                   },
                   "numInt": 1,
                   "numDecimal": 0,
-                  "ignoreZones": false,
+                  "ignoreZones": true,
                   "color": "green",
                   "enableTimeout": false,
                   "dataTimeout": 5
@@ -376,60 +395,18 @@
             }
           },
           {
-            "x": 8,
-            "y": 12,
-            "w": 8,
-            "h": 8,
-            "id": "3d6cb833-5671-59c4-b726-3ad7cfe23113",
-            "selector": "widget-host2",
-            "input": {
-              "widgetProperties": {
-                "type": "widget-numeric",
-                "uuid": "3d6cb833-5671-59c4-b726-3ad7cfe23113",
-                "config": {
-                  "displayName": "Coolant",
-                  "filterSelfPaths": true,
-                  "paths": {
-                    "numericPath": {
-                      "description": "Numeric Data",
-                      "path": "self.propulsion.0.coolantTemperature",
-                      "source": "default",
-                      "pathType": "number",
-                      "isPathConfigurable": true,
-                      "convertUnitTo": "celsius",
-                      "showPathSkUnitsFilter": true,
-                      "pathSkUnitsFilter": null,
-                      "sampleTime": 500
-                    }
-                  },
-                  "showMax": false,
-                  "showMin": false,
-                  "numDecimal": 0,
-                  "showMiniChart": true,
-                  "yScaleMin": 0,
-                  "yScaleMax": 110,
-                  "inverseYAxis": false,
-                  "verticalChart": false,
-                  "color": "orange",
-                  "enableTimeout": false,
-                  "dataTimeout": 5,
-                  "ignoreZones": false
-                }
-              }
-            }
-          },
-          {
-            "x": 16,
-            "y": 12,
-            "w": 8,
-            "h": 8,
-            "id": "71166172-245f-5687-b4df-fbfe14752919",
+            "x": 7,
+            "y": 17,
+            "w": 6,
+            "h": 3,
+            "id": "46c4afe8-8fc5-5ed6-9ed3-272a8debf83c",
             "selector": "widget-host2",
             "input": {
               "widgetProperties": {
                 "type": "widget-simple-linear",
-                "uuid": "71166172-245f-5687-b4df-fbfe14752919",
+                "uuid": "46c4afe8-8fc5-5ed6-9ed3-272a8debf83c",
                 "config": {
+                  "supportAutomaticHistoricalSeries": true,
                   "displayName": "Voltage",
                   "filterSelfPaths": true,
                   "paths": {
@@ -465,27 +442,27 @@
             }
           },
           {
-            "x": 0,
-            "y": 20,
-            "w": 8,
+            "w": 3,
             "h": 4,
-            "id": "d73e0821-0b4e-5840-b50b-4e760bcf70a4",
+            "id": "635513f1-80cf-4489-96fc-7afa5b625202",
             "selector": "widget-host2",
             "input": {
               "widgetProperties": {
                 "type": "widget-numeric",
-                "uuid": "d73e0821-0b4e-5840-b50b-4e760bcf70a4",
+                "uuid": "635513f1-80cf-4489-96fc-7afa5b625202",
                 "config": {
-                  "displayName": "Trim",
+                  "supportAutomaticHistoricalSeries": true,
+                  "displayName": "Fuel L",
                   "filterSelfPaths": true,
                   "paths": {
                     "numericPath": {
                       "description": "Numeric Data",
-                      "path": "self.propulsion.0.trim",
+                      "path": "self.tanks.fuel.0.currentVolume",
                       "source": "default",
                       "pathType": "number",
+                      "suppressBootstrapNull": true,
                       "isPathConfigurable": true,
-                      "convertUnitTo": "%",
+                      "convertUnitTo": "liter",
                       "showPathSkUnitsFilter": true,
                       "pathSkUnitsFilter": null,
                       "sampleTime": 500
@@ -493,13 +470,105 @@
                   },
                   "showMax": false,
                   "showMin": false,
-                  "numDecimal": 0,
+                  "numDecimal": 1,
+                  "showMiniChart": false,
+                  "yScaleMin": 0,
+                  "yScaleMax": 25,
+                  "inverseYAxis": false,
+                  "verticalChart": false,
+                  "color": "green",
+                  "enableTimeout": false,
+                  "dataTimeout": 5,
+                  "ignoreZones": false
+                }
+              }
+            },
+            "x": 0,
+            "y": 20
+          },
+          {
+            "w": 4,
+            "h": 4,
+            "id": "aea30e77-60ac-4fbc-9c6d-7a88f5687e34",
+            "selector": "widget-host2",
+            "input": {
+              "widgetProperties": {
+                "type": "widget-numeric",
+                "uuid": "aea30e77-60ac-4fbc-9c6d-7a88f5687e34",
+                "config": {
+                  "supportAutomaticHistoricalSeries": true,
+                  "displayName": "Range",
+                  "filterSelfPaths": true,
+                  "paths": {
+                    "numericPath": {
+                      "description": "Numeric Data",
+                      "path": "self.tanks.fuel.0.distanceRange",
+                      "source": "default",
+                      "pathType": "number",
+                      "suppressBootstrapNull": true,
+                      "isPathConfigurable": true,
+                      "convertUnitTo": "nm",
+                      "showPathSkUnitsFilter": true,
+                      "pathSkUnitsFilter": null,
+                      "sampleTime": 500
+                    }
+                  },
+                  "showMax": false,
+                  "showMin": false,
+                  "numDecimal": 1,
                   "showMiniChart": false,
                   "yScaleMin": 0,
                   "yScaleMax": 100,
                   "inverseYAxis": false,
                   "verticalChart": false,
-                  "color": "contrast",
+                  "color": "green",
+                  "enableTimeout": false,
+                  "dataTimeout": 5,
+                  "ignoreZones": false
+                }
+              }
+            },
+            "x": 3,
+            "y": 20
+          },
+          {
+            "x": 7,
+            "y": 20,
+            "w": 6,
+            "h": 4,
+            "id": "58e12d70-47e8-5ea2-9189-3429757da75b",
+            "selector": "widget-host2",
+            "input": {
+              "widgetProperties": {
+                "type": "widget-numeric",
+                "uuid": "58e12d70-47e8-5ea2-9189-3429757da75b",
+                "config": {
+                  "supportAutomaticHistoricalSeries": true,
+                  "displayName": "Fuel Rate",
+                  "filterSelfPaths": true,
+                  "paths": {
+                    "numericPath": {
+                      "description": "Numeric Data",
+                      "path": "self.propulsion.port.fuel.rate",
+                      "source": "default",
+                      "pathType": "number",
+                      "suppressBootstrapNull": true,
+                      "isPathConfigurable": true,
+                      "convertUnitTo": "l/h",
+                      "showPathSkUnitsFilter": true,
+                      "pathSkUnitsFilter": null,
+                      "sampleTime": 500
+                    }
+                  },
+                  "showMax": false,
+                  "showMin": false,
+                  "numDecimal": 1,
+                  "showMiniChart": false,
+                  "yScaleMin": 0,
+                  "yScaleMax": 100,
+                  "inverseYAxis": false,
+                  "verticalChart": false,
+                  "color": "orange",
                   "enableTimeout": false,
                   "dataTimeout": 5,
                   "ignoreZones": false
@@ -508,25 +577,27 @@
             }
           },
           {
-            "x": 8,
+            "x": 13,
             "y": 20,
-            "w": 8,
+            "w": 6,
             "h": 4,
-            "id": "4ddb1d26-3c51-5d67-bb49-6a9833138742",
+            "id": "b5f2fafb-ae34-5a39-bded-b89847a0ac82",
             "selector": "widget-host2",
             "input": {
               "widgetProperties": {
                 "type": "widget-numeric",
-                "uuid": "4ddb1d26-3c51-5d67-bb49-6a9833138742",
+                "uuid": "b5f2fafb-ae34-5a39-bded-b89847a0ac82",
                 "config": {
-                  "displayName": "Engine Hours",
+                  "supportAutomaticHistoricalSeries": true,
+                  "displayName": "Hours",
                   "filterSelfPaths": true,
                   "paths": {
                     "numericPath": {
                       "description": "Numeric Data",
-                      "path": "self.propulsion.0.runTime",
+                      "path": "self.propulsion.port.runTime",
                       "source": "default",
                       "pathType": "number",
+                      "suppressBootstrapNull": true,
                       "isPathConfigurable": true,
                       "convertUnitTo": "Hours",
                       "showPathSkUnitsFilter": true,
@@ -551,44 +622,54 @@
             }
           },
           {
-            "x": 16,
+            "x": 19,
             "y": 20,
-            "w": 8,
+            "w": 5,
             "h": 4,
-            "id": "93eb7e17-2742-5b24-8b45-18c64f1c8c4e",
+            "minW": 1,
+            "minH": 2,
+            "id": "466d9f09-ba76-4e37-82a9-ca56c3f5d308",
             "selector": "widget-host2",
             "input": {
               "widgetProperties": {
-                "type": "widget-numeric",
-                "uuid": "93eb7e17-2742-5b24-8b45-18c64f1c8c4e",
+                "type": "widget-boolean-switch",
+                "uuid": "466d9f09-ba76-4e37-82a9-ca56c3f5d308",
                 "config": {
-                  "displayName": "Fuel Rate",
+                  "displayName": "Tank",
+                  "showLabel": true,
                   "filterSelfPaths": true,
-                  "paths": {
-                    "numericPath": {
-                      "description": "Numeric Data",
-                      "path": "self.propulsion.0.fuel.rate",
+                  "paths": [
+                    {
+                      "description": "Refill tank",
+                      "path": "self.tanks.fuel.0.currentLevel",
+                      "pathID": "f1946dfa-5a59-4aea-912a-c8c02ea96bc3",
                       "source": "default",
                       "pathType": "number",
+                      "zonesOnlyPaths": false,
                       "isPathConfigurable": true,
-                      "convertUnitTo": "l/h",
-                      "showPathSkUnitsFilter": true,
+                      "showPathSkUnitsFilter": false,
                       "pathSkUnitsFilter": null,
-                      "sampleTime": 500
+                      "convertUnitTo": "ratio",
+                      "sampleTime": 500,
+                      "supportsPut": true
                     }
-                  },
-                  "showMax": false,
-                  "showMin": false,
-                  "numDecimal": 2,
-                  "showMiniChart": false,
-                  "yScaleMin": 0,
-                  "yScaleMax": 100,
-                  "inverseYAxis": false,
-                  "verticalChart": false,
-                  "color": "orange",
+                  ],
                   "enableTimeout": false,
                   "dataTimeout": 5,
-                  "ignoreZones": false
+                  "color": "contrast",
+                  "zonesOnlyPaths": false,
+                  "putEnable": true,
+                  "putMomentary": false,
+                  "multiChildCtrls": [
+                    {
+                      "ctrlLabel": "Refill tank",
+                      "type": "2",
+                      "pathID": "f1946dfa-5a59-4aea-912a-c8c02ea96bc3",
+                      "color": "contrast",
+                      "isNumeric": true,
+                      "value": null
+                    }
+                  ]
                 }
               }
             }
@@ -606,49 +687,6 @@
             "y": 0,
             "w": 14,
             "h": 12,
-            "id": "8d69fe23-c9ae-5b2e-9bb9-92e83f3f064e",
-            "selector": "widget-host2",
-            "input": {
-              "widgetProperties": {
-                "type": "widget-numeric",
-                "uuid": "8d69fe23-c9ae-5b2e-9bb9-92e83f3f064e",
-                "config": {
-                  "displayName": "Depth",
-                  "filterSelfPaths": true,
-                  "paths": {
-                    "numericPath": {
-                      "description": "Numeric Data",
-                      "path": "self.environment.depth.belowTransducer",
-                      "source": "default",
-                      "pathType": "number",
-                      "isPathConfigurable": true,
-                      "convertUnitTo": "m",
-                      "showPathSkUnitsFilter": true,
-                      "pathSkUnitsFilter": null,
-                      "sampleTime": 500
-                    }
-                  },
-                  "showMax": true,
-                  "showMin": true,
-                  "numDecimal": 1,
-                  "showMiniChart": true,
-                  "yScaleMin": 0,
-                  "yScaleMax": 30,
-                  "inverseYAxis": false,
-                  "verticalChart": false,
-                  "color": "contrast",
-                  "enableTimeout": false,
-                  "dataTimeout": 5,
-                  "ignoreZones": false
-                }
-              }
-            }
-          },
-          {
-            "x": 14,
-            "y": 0,
-            "w": 10,
-            "h": 6,
             "id": "3a7dbc7c-2051-50f0-b38e-3c4e8bbe470f",
             "selector": "widget-host2",
             "input": {
@@ -674,7 +712,7 @@
                   "showMax": true,
                   "showMin": true,
                   "numDecimal": 1,
-                  "showMiniChart": false,
+                  "showMiniChart": true,
                   "yScaleMin": 0,
                   "yScaleMax": 10,
                   "inverseYAxis": false,
@@ -689,9 +727,9 @@
           },
           {
             "x": 14,
-            "y": 6,
+            "y": 0,
             "w": 10,
-            "h": 6,
+            "h": 12,
             "id": "09dcb731-1286-5a8e-821c-3ed379699b43",
             "selector": "widget-host2",
             "input": {
@@ -734,20 +772,20 @@
             "y": 12,
             "w": 14,
             "h": 8,
-            "id": "fab33c8b-b5d8-5e12-86f2-fff51884e540",
+            "id": "fb9f2024-3444-5142-900c-c9aa7bf5c7d4",
             "selector": "widget-host2",
             "input": {
               "widgetProperties": {
                 "type": "widget-data-chart",
-                "uuid": "fab33c8b-b5d8-5e12-86f2-fff51884e540",
+                "uuid": "fb9f2024-3444-5142-900c-c9aa7bf5c7d4",
                 "config": {
-                  "displayName": "Depth (10 min)",
+                  "displayName": "Speed (10 min)",
                   "filterSelfPaths": true,
-                  "datachartPath": "self.environment.depth.belowTransducer",
+                  "datachartPath": "self.navigation.speedOverGround",
                   "datachartSource": "default",
                   "period": 10,
                   "timeScale": "minute",
-                  "convertUnitTo": "m",
+                  "convertUnitTo": "knots",
                   "timeScaleFormat": "minute",
                   "inverseYAxis": false,
                   "datasetAverageArray": "sma",
@@ -763,12 +801,12 @@
                   "verticalChart": false,
                   "showYScale": true,
                   "yScaleSuggestedMin": 0,
-                  "yScaleSuggestedMax": 20,
+                  "yScaleSuggestedMax": 8,
                   "enableMinMaxScaleLimit": false,
                   "yScaleMin": null,
                   "yScaleMax": null,
                   "numDecimal": 1,
-                  "color": "contrast",
+                  "color": "blue",
                   "invertData": false,
                   "verticalGraph": false
                 }
@@ -825,7 +863,7 @@
           {
             "x": 0,
             "y": 20,
-            "w": 8,
+            "w": 6,
             "h": 4,
             "id": "3585d6db-69cf-5411-9c1d-310f1b30a57a",
             "selector": "widget-host2",
@@ -839,7 +877,7 @@
                   "paths": {
                     "numericPath": {
                       "description": "Numeric Data",
-                      "path": "self.propulsion.0.revolutions",
+                      "path": "self.propulsion.port.revolutions",
                       "source": "default",
                       "pathType": "number",
                       "isPathConfigurable": true,
@@ -866,9 +904,9 @@
             }
           },
           {
-            "x": 8,
+            "x": 6,
             "y": 20,
-            "w": 8,
+            "w": 6,
             "h": 4,
             "id": "c514e2c6-24ec-56bb-a9d6-2546f72e98a1",
             "selector": "widget-host2",
@@ -882,7 +920,7 @@
                   "paths": {
                     "numericPath": {
                       "description": "Numeric Data",
-                      "path": "self.propulsion.0.trim",
+                      "path": "self.propulsion.port.drive.trimState",
                       "source": "default",
                       "pathType": "number",
                       "isPathConfigurable": true,
@@ -909,9 +947,9 @@
             }
           },
           {
-            "x": 16,
+            "x": 12,
             "y": 20,
-            "w": 8,
+            "w": 6,
             "h": 4,
             "id": "9146855c-c665-579c-8480-9db9d59ebbea",
             "selector": "widget-host2",
@@ -950,342 +988,82 @@
                 }
               }
             }
+          },
+          {
+            "x": 18,
+            "y": 20,
+            "w": 6,
+            "h": 4,
+            "id": "481b66a7-ca07-530b-a341-227e3b7dffec",
+            "selector": "widget-host2",
+            "input": {
+              "widgetProperties": {
+                "type": "widget-numeric",
+                "uuid": "481b66a7-ca07-530b-a341-227e3b7dffec",
+                "config": {
+                  "displayName": "Range",
+                  "filterSelfPaths": true,
+                  "paths": {
+                    "numericPath": {
+                      "description": "Numeric Data",
+                      "path": "self.tanks.fuel.0.distanceRange",
+                      "source": "default",
+                      "pathType": "number",
+                      "isPathConfigurable": true,
+                      "convertUnitTo": "nm",
+                      "showPathSkUnitsFilter": true,
+                      "pathSkUnitsFilter": null,
+                      "sampleTime": 500
+                    }
+                  },
+                  "showMax": false,
+                  "showMin": false,
+                  "numDecimal": 1,
+                  "showMiniChart": false,
+                  "yScaleMin": 0,
+                  "yScaleMax": 100,
+                  "inverseYAxis": false,
+                  "verticalChart": false,
+                  "color": "green",
+                  "enableTimeout": false,
+                  "dataTimeout": 5,
+                  "ignoreZones": false
+                }
+              }
+            }
           }
         ],
         "collapseSplitShell": false
       },
       {
-        "id": "8887469b-e18e-5595-8222-daf1369adbc3",
-        "name": "Navigation",
+        "id": "9978b0a9-d792-5952-af94-82f80b66994e",
+        "name": "Statistics",
         "icon": "dashboard-sailing",
         "configuration": [
           {
             "x": 0,
             "y": 0,
             "w": 12,
-            "h": 12,
-            "id": "9191f60d-4ef4-5740-877b-b25ff0173afb",
-            "selector": "widget-host2",
-            "input": {
-              "widgetProperties": {
-                "type": "widget-gauge-ng-compass",
-                "uuid": "9191f60d-4ef4-5740-877b-b25ff0173afb",
-                "config": {
-                  "displayName": "COG",
-                  "filterSelfPaths": true,
-                  "paths": {
-                    "gaugePath": {
-                      "description": "Numeric Data",
-                      "path": "self.navigation.courseOverGroundTrue",
-                      "source": "default",
-                      "pathType": "number",
-                      "isPathConfigurable": true,
-                      "showPathSkUnitsFilter": false,
-                      "pathSkUnitsFilter": "rad",
-                      "showConvertUnitTo": false,
-                      "convertUnitTo": "deg",
-                      "sampleTime": 500
-                    }
-                  },
-                  "gauge": {
-                    "type": "ngRadial",
-                    "subType": "marineCompass",
-                    "enableTicks": true,
-                    "compassUseNumbers": true,
-                    "showValueBox": true
-                  },
-                  "enableTimeout": false,
-                  "color": "purple",
-                  "dataTimeout": 5
-                }
-              }
-            }
-          },
-          {
-            "x": 12,
-            "y": 0,
-            "w": 12,
-            "h": 6,
-            "id": "f57fff1f-ffed-5372-a16f-62a77190595e",
-            "selector": "widget-host2",
-            "input": {
-              "widgetProperties": {
-                "type": "widget-numeric",
-                "uuid": "f57fff1f-ffed-5372-a16f-62a77190595e",
-                "config": {
-                  "displayName": "SOG",
-                  "filterSelfPaths": true,
-                  "paths": {
-                    "numericPath": {
-                      "description": "Numeric Data",
-                      "path": "self.navigation.speedOverGround",
-                      "source": "default",
-                      "pathType": "number",
-                      "isPathConfigurable": true,
-                      "convertUnitTo": "knots",
-                      "showPathSkUnitsFilter": true,
-                      "pathSkUnitsFilter": null,
-                      "sampleTime": 500
-                    }
-                  },
-                  "showMax": false,
-                  "showMin": false,
-                  "numDecimal": 1,
-                  "showMiniChart": true,
-                  "yScaleMin": 0,
-                  "yScaleMax": 25,
-                  "inverseYAxis": false,
-                  "verticalChart": false,
-                  "color": "blue",
-                  "enableTimeout": false,
-                  "dataTimeout": 5,
-                  "ignoreZones": false
-                }
-              }
-            }
-          },
-          {
-            "x": 12,
-            "y": 6,
-            "w": 12,
-            "h": 6,
-            "minW": 1,
-            "minH": 1,
-            "id": "60569da7-b21f-5c79-9431-7641970fc278",
-            "selector": "widget-host2",
-            "input": {
-              "widgetProperties": {
-                "type": "widget-position",
-                "uuid": "60569da7-b21f-5c79-9431-7641970fc278",
-                "config": {
-                  "displayName": "Position",
-                  "filterSelfPaths": true,
-                  "paths": {
-                    "longPath": {
-                      "description": "Longitude",
-                      "path": "self.navigation.position.longitude",
-                      "source": "default",
-                      "pathType": "number",
-                      "isPathConfigurable": true,
-                      "convertUnitTo": "longitudeMin",
-                      "showPathSkUnitsFilter": true,
-                      "pathSkUnitsFilter": null,
-                      "sampleTime": 500
-                    },
-                    "latPath": {
-                      "description": "Latitude",
-                      "path": "self.navigation.position.latitude",
-                      "source": "default",
-                      "pathType": "number",
-                      "isPathConfigurable": true,
-                      "convertUnitTo": "latitudeMin",
-                      "showPathSkUnitsFilter": true,
-                      "pathSkUnitsFilter": null,
-                      "sampleTime": 500
-                    }
-                  },
-                  "color": "grey",
-                  "enableTimeout": false,
-                  "dataTimeout": 5
-                }
-              }
-            }
-          },
-          {
-            "x": 0,
-            "y": 12,
-            "w": 24,
             "h": 8,
-            "id": "bb5cf37d-526d-5fdf-8d8a-91e9d5bcbc3e",
-            "selector": "widget-host2",
-            "input": {
-              "widgetProperties": {
-                "type": "widget-data-chart",
-                "uuid": "bb5cf37d-526d-5fdf-8d8a-91e9d5bcbc3e",
-                "config": {
-                  "displayName": "Speed Over Ground (30 min)",
-                  "filterSelfPaths": true,
-                  "datachartPath": "self.navigation.speedOverGround",
-                  "datachartSource": "default",
-                  "period": 30,
-                  "timeScale": "minute",
-                  "convertUnitTo": "knots",
-                  "timeScaleFormat": "minute",
-                  "inverseYAxis": false,
-                  "datasetAverageArray": "sma",
-                  "showAverageData": true,
-                  "trackAgainstAverage": false,
-                  "showDatasetMinimumValueLine": false,
-                  "showDatasetMaximumValueLine": false,
-                  "showDatasetAverageValueLine": true,
-                  "showDatasetAngleAverageValueLine": false,
-                  "showLabel": true,
-                  "showTimeScale": true,
-                  "startScaleAtZero": true,
-                  "verticalChart": false,
-                  "showYScale": true,
-                  "yScaleSuggestedMin": 0,
-                  "yScaleSuggestedMax": 25,
-                  "enableMinMaxScaleLimit": false,
-                  "yScaleMin": null,
-                  "yScaleMax": null,
-                  "numDecimal": 1,
-                  "color": "blue",
-                  "invertData": false,
-                  "verticalGraph": false
-                }
-              }
-            }
-          },
-          {
-            "x": 0,
-            "y": 20,
-            "w": 8,
-            "h": 4,
-            "id": "1439ca36-e74a-534b-a574-e0196695263a",
-            "selector": "widget-host2",
-            "input": {
-              "widgetProperties": {
-                "type": "widget-datetime",
-                "uuid": "1439ca36-e74a-534b-a574-e0196695263a",
-                "config": {
-                  "displayName": "Local Time",
-                  "filterSelfPaths": true,
-                  "paths": {
-                    "gaugePath": {
-                      "description": "String Data",
-                      "path": "self.environment.time",
-                      "source": "default",
-                      "pathType": "Date",
-                      "isPathConfigurable": true,
-                      "sampleTime": 500
-                    }
-                  },
-                  "dateFormat": "HH:mm:ss",
-                  "dateTimezone": "Europe/Helsinki",
-                  "color": "contrast",
-                  "enableTimeout": false,
-                  "dataTimeout": 5
-                }
-              }
-            }
-          },
-          {
-            "x": 8,
-            "y": 20,
-            "w": 8,
-            "h": 4,
-            "id": "8329c018-cb6f-5664-8db0-7212bdd9f57b",
+            "id": "c1c47638-03a3-5fe1-ad95-97f01fa569ad",
             "selector": "widget-host2",
             "input": {
               "widgetProperties": {
                 "type": "widget-numeric",
-                "uuid": "8329c018-cb6f-5664-8db0-7212bdd9f57b",
+                "uuid": "c1c47638-03a3-5fe1-ad95-97f01fa569ad",
                 "config": {
-                  "displayName": "Depth",
-                  "filterSelfPaths": true,
-                  "paths": {
-                    "numericPath": {
-                      "description": "Numeric Data",
-                      "path": "self.environment.depth.belowTransducer",
-                      "source": "default",
-                      "pathType": "number",
-                      "isPathConfigurable": true,
-                      "convertUnitTo": "m",
-                      "showPathSkUnitsFilter": true,
-                      "pathSkUnitsFilter": null,
-                      "sampleTime": 500
-                    }
-                  },
-                  "showMax": false,
-                  "showMin": false,
-                  "numDecimal": 1,
-                  "showMiniChart": false,
-                  "yScaleMin": 0,
-                  "yScaleMax": 30,
-                  "inverseYAxis": false,
-                  "verticalChart": false,
-                  "color": "contrast",
-                  "enableTimeout": false,
-                  "dataTimeout": 5,
-                  "ignoreZones": false
-                }
-              }
-            }
-          },
-          {
-            "x": 16,
-            "y": 20,
-            "w": 8,
-            "h": 4,
-            "id": "6f612957-1132-58f8-b53b-86ee85fa90e5",
-            "selector": "widget-host2",
-            "input": {
-              "widgetProperties": {
-                "type": "widget-numeric",
-                "uuid": "6f612957-1132-58f8-b53b-86ee85fa90e5",
-                "config": {
-                  "displayName": "COG (deg)",
-                  "filterSelfPaths": true,
-                  "paths": {
-                    "numericPath": {
-                      "description": "Numeric Data",
-                      "path": "self.navigation.courseOverGroundTrue",
-                      "source": "default",
-                      "pathType": "number",
-                      "isPathConfigurable": true,
-                      "convertUnitTo": "deg",
-                      "showPathSkUnitsFilter": true,
-                      "pathSkUnitsFilter": "rad",
-                      "sampleTime": 500
-                    }
-                  },
-                  "showMax": false,
-                  "showMin": false,
-                  "numDecimal": 0,
-                  "showMiniChart": false,
-                  "yScaleMin": 0,
-                  "yScaleMax": 360,
-                  "inverseYAxis": false,
-                  "verticalChart": false,
-                  "color": "purple",
-                  "enableTimeout": false,
-                  "dataTimeout": 5,
-                  "ignoreZones": false
-                }
-              }
-            }
-          }
-        ],
-        "collapseSplitShell": false
-      },
-      {
-        "id": "5e72fe2d-c58e-59bb-a44a-acfd81fa4e62",
-        "name": "Engine",
-        "icon": "dashboard-dashboard",
-        "configuration": [
-          {
-            "x": 0,
-            "y": 0,
-            "w": 12,
-            "h": 8,
-            "id": "045af370-0ad2-587d-bd2c-5671a39739c9",
-            "selector": "widget-host2",
-            "input": {
-              "widgetProperties": {
-                "type": "widget-numeric",
-                "uuid": "045af370-0ad2-587d-bd2c-5671a39739c9",
-                "config": {
+                  "supportAutomaticHistoricalSeries": true,
                   "displayName": "Prop Slip",
                   "filterSelfPaths": true,
                   "paths": {
                     "numericPath": {
                       "description": "Numeric Data",
-                      "path": "self.propulsion.0.slip",
+                      "path": "self.propulsion.port.slip",
                       "source": "default",
                       "pathType": "number",
+                      "suppressBootstrapNull": true,
                       "isPathConfigurable": true,
-                      "convertUnitTo": "%",
+                      "convertUnitTo": "percent",
                       "showPathSkUnitsFilter": true,
                       "pathSkUnitsFilter": null,
                       "sampleTime": 500
@@ -1312,23 +1090,70 @@
             "y": 0,
             "w": 12,
             "h": 8,
-            "id": "4a003180-04d6-569c-b4ac-859db8ccfbc8",
+            "id": "817ae746-b672-5ff2-a3e3-f20bc157db25",
+            "selector": "widget-host2",
+            "input": {
+              "widgetProperties": {
+                "type": "widget-numeric",
+                "uuid": "817ae746-b672-5ff2-a3e3-f20bc157db25",
+                "config": {
+                  "supportAutomaticHistoricalSeries": true,
+                  "displayName": "Economy (nm/L)",
+                  "filterSelfPaths": true,
+                  "paths": {
+                    "numericPath": {
+                      "description": "Numeric Data",
+                      "path": "self.tanks.fuel.0.distancePerFuel",
+                      "source": "default",
+                      "pathType": "number",
+                      "suppressBootstrapNull": true,
+                      "isPathConfigurable": true,
+                      "convertUnitTo": "nm/l",
+                      "showPathSkUnitsFilter": true,
+                      "pathSkUnitsFilter": null,
+                      "sampleTime": 500
+                    }
+                  },
+                  "showMax": false,
+                  "showMin": false,
+                  "numDecimal": 2,
+                  "showMiniChart": true,
+                  "yScaleMin": 0,
+                  "yScaleMax": 5,
+                  "inverseYAxis": false,
+                  "verticalChart": false,
+                  "color": "green",
+                  "enableTimeout": false,
+                  "dataTimeout": 5,
+                  "ignoreZones": false
+                }
+              }
+            }
+          },
+          {
+            "x": 0,
+            "y": 8,
+            "w": 8,
+            "h": 8,
+            "id": "bf00ace2-f199-5f86-bcb9-28c254ac07ef",
             "selector": "widget-host2",
             "input": {
               "widgetProperties": {
                 "type": "widget-data-chart",
-                "uuid": "4a003180-04d6-569c-b4ac-859db8ccfbc8",
+                "uuid": "bf00ace2-f199-5f86-bcb9-28c254ac07ef",
                 "config": {
-                  "displayName": "Slip vs Theoretical (30 min)",
+                  "displayName": "Slip % (30 min)",
+                  "color": "purple",
                   "filterSelfPaths": true,
-                  "datachartPath": "self.propulsion.0.slip",
+                  "datachartPath": "self.propulsion.port.slip",
                   "datachartSource": "default",
-                  "period": 30,
+                  "convertUnitTo": "percent",
                   "timeScale": "minute",
-                  "convertUnitTo": "%",
-                  "timeScaleFormat": "minute",
+                  "period": 30,
+                  "numDecimal": 1,
                   "inverseYAxis": false,
                   "datasetAverageArray": "sma",
+                  "showDataPoints": false,
                   "showAverageData": true,
                   "trackAgainstAverage": false,
                   "showDatasetMinimumValueLine": false,
@@ -1345,54 +1170,7 @@
                   "enableMinMaxScaleLimit": false,
                   "yScaleMin": null,
                   "yScaleMax": null,
-                  "numDecimal": 1,
-                  "color": "purple",
-                  "invertData": false,
-                  "verticalGraph": false
-                }
-              }
-            }
-          },
-          {
-            "x": 0,
-            "y": 8,
-            "w": 8,
-            "h": 8,
-            "id": "4810a64e-274c-562d-b499-0c7489f56e79",
-            "selector": "widget-host2",
-            "input": {
-              "widgetProperties": {
-                "type": "widget-data-chart",
-                "uuid": "4810a64e-274c-562d-b499-0c7489f56e79",
-                "config": {
-                  "displayName": "RPM (30 min)",
-                  "filterSelfPaths": true,
-                  "datachartPath": "self.propulsion.0.revolutions",
-                  "datachartSource": "default",
-                  "period": 30,
-                  "timeScale": "minute",
-                  "convertUnitTo": "RPM",
                   "timeScaleFormat": "minute",
-                  "inverseYAxis": false,
-                  "datasetAverageArray": "sma",
-                  "showAverageData": true,
-                  "trackAgainstAverage": false,
-                  "showDatasetMinimumValueLine": false,
-                  "showDatasetMaximumValueLine": false,
-                  "showDatasetAverageValueLine": true,
-                  "showDatasetAngleAverageValueLine": false,
-                  "showLabel": true,
-                  "showTimeScale": true,
-                  "startScaleAtZero": true,
-                  "verticalChart": false,
-                  "showYScale": true,
-                  "yScaleSuggestedMin": 0,
-                  "yScaleSuggestedMax": 7000,
-                  "enableMinMaxScaleLimit": false,
-                  "yScaleMin": null,
-                  "yScaleMax": null,
-                  "numDecimal": 1,
-                  "color": "yellow",
                   "invertData": false,
                   "verticalGraph": false
                 }
@@ -1404,23 +1182,25 @@
             "y": 8,
             "w": 8,
             "h": 8,
-            "id": "965464e9-c5ed-5472-9242-54d02e64284c",
+            "id": "2cce09f4-00c9-5bbb-81b7-eab991f49adb",
             "selector": "widget-host2",
             "input": {
               "widgetProperties": {
                 "type": "widget-data-chart",
-                "uuid": "965464e9-c5ed-5472-9242-54d02e64284c",
+                "uuid": "2cce09f4-00c9-5bbb-81b7-eab991f49adb",
                 "config": {
                   "displayName": "Fuel Rate (60 min)",
+                  "color": "orange",
                   "filterSelfPaths": true,
-                  "datachartPath": "self.propulsion.0.fuel.rate",
+                  "datachartPath": "self.propulsion.port.fuel.rate",
                   "datachartSource": "default",
-                  "period": 1,
-                  "timeScale": "hour",
                   "convertUnitTo": "l/h",
-                  "timeScaleFormat": "hour",
+                  "timeScale": "hour",
+                  "period": 1,
+                  "numDecimal": 1,
                   "inverseYAxis": false,
                   "datasetAverageArray": "sma",
+                  "showDataPoints": false,
                   "showAverageData": true,
                   "trackAgainstAverage": false,
                   "showDatasetMinimumValueLine": false,
@@ -1437,8 +1217,7 @@
                   "enableMinMaxScaleLimit": false,
                   "yScaleMin": null,
                   "yScaleMax": null,
-                  "numDecimal": 1,
-                  "color": "orange",
+                  "timeScaleFormat": "hour",
                   "invertData": false,
                   "verticalGraph": false
                 }
@@ -1450,23 +1229,25 @@
             "y": 8,
             "w": 8,
             "h": 8,
-            "id": "375dab5a-88f3-5774-884d-a5484c4720c6",
+            "id": "c8804b7c-438e-54a6-9136-fc84a4c5ed8a",
             "selector": "widget-host2",
             "input": {
               "widgetProperties": {
                 "type": "widget-data-chart",
-                "uuid": "375dab5a-88f3-5774-884d-a5484c4720c6",
+                "uuid": "c8804b7c-438e-54a6-9136-fc84a4c5ed8a",
                 "config": {
                   "displayName": "Coolant °C (30 min)",
+                  "color": "orange",
                   "filterSelfPaths": true,
-                  "datachartPath": "self.propulsion.0.coolantTemperature",
+                  "datachartPath": "self.propulsion.port.temperature",
                   "datachartSource": "default",
-                  "period": 30,
-                  "timeScale": "minute",
                   "convertUnitTo": "celsius",
-                  "timeScaleFormat": "minute",
+                  "timeScale": "minute",
+                  "period": 30,
+                  "numDecimal": 1,
                   "inverseYAxis": false,
                   "datasetAverageArray": "sma",
+                  "showDataPoints": false,
                   "showAverageData": true,
                   "trackAgainstAverage": false,
                   "showDatasetMinimumValueLine": false,
@@ -1483,8 +1264,7 @@
                   "enableMinMaxScaleLimit": false,
                   "yScaleMin": null,
                   "yScaleMax": null,
-                  "numDecimal": 1,
-                  "color": "orange",
+                  "timeScaleFormat": "minute",
                   "invertData": false,
                   "verticalGraph": false
                 }
@@ -1494,71 +1274,256 @@
           {
             "x": 0,
             "y": 16,
-            "w": 6,
+            "w": 8,
             "h": 8,
-            "id": "0dda4001-6eb3-53f3-b02e-9f758435a34a",
+            "id": "aa147b10-bff7-5b09-a8f5-8e94c6ad0bf9",
             "selector": "widget-host2",
             "input": {
               "widgetProperties": {
-                "type": "widget-simple-linear",
-                "uuid": "0dda4001-6eb3-53f3-b02e-9f758435a34a",
+                "type": "widget-data-chart",
+                "uuid": "aa147b10-bff7-5b09-a8f5-8e94c6ad0bf9",
                 "config": {
-                  "displayName": "Voltage",
+                  "displayName": "SOG (30 min)",
+                  "color": "blue",
                   "filterSelfPaths": true,
-                  "paths": {
-                    "gaugePath": {
-                      "description": "Numeric Data",
-                      "path": "self.electrical.batteries.0.voltage",
-                      "source": "default",
-                      "pathType": "number",
-                      "isPathConfigurable": true,
-                      "showPathSkUnitsFilter": true,
-                      "pathSkUnitsFilter": null,
-                      "convertUnitTo": "V",
-                      "sampleTime": 500
-                    }
-                  },
-                  "displayScale": {
-                    "lower": 10,
-                    "upper": 15,
-                    "type": "linear"
-                  },
-                  "gauge": {
-                    "type": "simpleLinear",
-                    "unitLabelFormat": "full"
-                  },
-                  "numInt": 1,
-                  "numDecimal": 2,
-                  "ignoreZones": false,
-                  "color": "green",
-                  "enableTimeout": false,
-                  "dataTimeout": 5
+                  "datachartPath": "self.navigation.speedOverGround",
+                  "datachartSource": "default",
+                  "convertUnitTo": "knots",
+                  "timeScale": "minute",
+                  "period": 30,
+                  "numDecimal": 1,
+                  "inverseYAxis": false,
+                  "datasetAverageArray": "sma",
+                  "showDataPoints": false,
+                  "showAverageData": true,
+                  "trackAgainstAverage": false,
+                  "showDatasetMinimumValueLine": false,
+                  "showDatasetMaximumValueLine": true,
+                  "showDatasetAverageValueLine": false,
+                  "showDatasetAngleAverageValueLine": false,
+                  "showLabel": true,
+                  "showTimeScale": true,
+                  "startScaleAtZero": true,
+                  "verticalChart": false,
+                  "showYScale": true,
+                  "yScaleSuggestedMin": 0,
+                  "yScaleSuggestedMax": 30,
+                  "enableMinMaxScaleLimit": false,
+                  "yScaleMin": null,
+                  "yScaleMax": null,
+                  "timeScaleFormat": "minute",
+                  "invertData": false,
+                  "verticalGraph": false
                 }
               }
             }
           },
           {
-            "x": 6,
+            "x": 8,
             "y": 16,
-            "w": 6,
+            "w": 8,
             "h": 8,
-            "id": "9f615a1d-e7e9-5b95-aec9-aae250192a25",
+            "id": "cbf852d9-947f-5f2e-bec6-289e5376e352",
+            "selector": "widget-host2",
+            "input": {
+              "widgetProperties": {
+                "type": "widget-data-chart",
+                "uuid": "cbf852d9-947f-5f2e-bec6-289e5376e352",
+                "config": {
+                  "displayName": "RPM (30 min)",
+                  "color": "yellow",
+                  "filterSelfPaths": true,
+                  "datachartPath": "self.propulsion.port.revolutions",
+                  "datachartSource": "default",
+                  "convertUnitTo": "rpm",
+                  "timeScale": "minute",
+                  "period": 30,
+                  "numDecimal": 1,
+                  "inverseYAxis": false,
+                  "datasetAverageArray": "sma",
+                  "showDataPoints": false,
+                  "showAverageData": true,
+                  "trackAgainstAverage": false,
+                  "showDatasetMinimumValueLine": false,
+                  "showDatasetMaximumValueLine": false,
+                  "showDatasetAverageValueLine": true,
+                  "showDatasetAngleAverageValueLine": false,
+                  "showLabel": true,
+                  "showTimeScale": true,
+                  "startScaleAtZero": true,
+                  "verticalChart": false,
+                  "showYScale": true,
+                  "yScaleSuggestedMin": 0,
+                  "yScaleSuggestedMax": 7000,
+                  "enableMinMaxScaleLimit": false,
+                  "yScaleMin": null,
+                  "yScaleMax": null,
+                  "timeScaleFormat": "minute",
+                  "invertData": false,
+                  "verticalGraph": false
+                }
+              }
+            }
+          },
+          {
+            "x": 16,
+            "y": 16,
+            "w": 4,
+            "h": 4,
+            "id": "bb103039-95a9-52a4-83d1-c4aebd901bf1",
             "selector": "widget-host2",
             "input": {
               "widgetProperties": {
                 "type": "widget-numeric",
-                "uuid": "9f615a1d-e7e9-5b95-aec9-aae250192a25",
+                "uuid": "bb103039-95a9-52a4-83d1-c4aebd901bf1",
                 "config": {
-                  "displayName": "Trim",
+                  "supportAutomaticHistoricalSeries": true,
+                  "displayName": "Time Left",
                   "filterSelfPaths": true,
                   "paths": {
                     "numericPath": {
                       "description": "Numeric Data",
-                      "path": "self.propulsion.0.trim",
+                      "path": "self.tanks.fuel.0.timeRange",
                       "source": "default",
                       "pathType": "number",
+                      "suppressBootstrapNull": true,
                       "isPathConfigurable": true,
-                      "convertUnitTo": "%",
+                      "convertUnitTo": "Hours",
+                      "showPathSkUnitsFilter": true,
+                      "pathSkUnitsFilter": null,
+                      "sampleTime": 500
+                    }
+                  },
+                  "showMax": false,
+                  "showMin": false,
+                  "numDecimal": 1,
+                  "showMiniChart": false,
+                  "yScaleMin": 0,
+                  "yScaleMax": 5,
+                  "inverseYAxis": false,
+                  "verticalChart": false,
+                  "color": "green",
+                  "enableTimeout": false,
+                  "dataTimeout": 5,
+                  "ignoreZones": false
+                }
+              }
+            }
+          },
+          {
+            "x": 20,
+            "y": 16,
+            "w": 4,
+            "h": 4,
+            "id": "8463bcde-ef38-5245-b7ee-d0e6039a5b6c",
+            "selector": "widget-host2",
+            "input": {
+              "widgetProperties": {
+                "type": "widget-numeric",
+                "uuid": "8463bcde-ef38-5245-b7ee-d0e6039a5b6c",
+                "config": {
+                  "supportAutomaticHistoricalSeries": true,
+                  "displayName": "Range",
+                  "filterSelfPaths": true,
+                  "paths": {
+                    "numericPath": {
+                      "description": "Numeric Data",
+                      "path": "self.tanks.fuel.0.distanceRange",
+                      "source": "default",
+                      "pathType": "number",
+                      "suppressBootstrapNull": true,
+                      "isPathConfigurable": true,
+                      "convertUnitTo": "nm",
+                      "showPathSkUnitsFilter": true,
+                      "pathSkUnitsFilter": null,
+                      "sampleTime": 500
+                    }
+                  },
+                  "showMax": false,
+                  "showMin": false,
+                  "numDecimal": 1,
+                  "showMiniChart": false,
+                  "yScaleMin": 0,
+                  "yScaleMax": 100,
+                  "inverseYAxis": false,
+                  "verticalChart": false,
+                  "color": "green",
+                  "enableTimeout": false,
+                  "dataTimeout": 5,
+                  "ignoreZones": false
+                }
+              }
+            }
+          },
+          {
+            "x": 16,
+            "y": 20,
+            "w": 4,
+            "h": 4,
+            "id": "572da2ff-08cf-5118-8571-3d9e45340a27",
+            "selector": "widget-host2",
+            "input": {
+              "widgetProperties": {
+                "type": "widget-numeric",
+                "uuid": "572da2ff-08cf-5118-8571-3d9e45340a27",
+                "config": {
+                  "supportAutomaticHistoricalSeries": true,
+                  "displayName": "Fuel L",
+                  "filterSelfPaths": true,
+                  "paths": {
+                    "numericPath": {
+                      "description": "Numeric Data",
+                      "path": "self.tanks.fuel.0.currentVolume",
+                      "source": "default",
+                      "pathType": "number",
+                      "suppressBootstrapNull": true,
+                      "isPathConfigurable": true,
+                      "convertUnitTo": "liter",
+                      "showPathSkUnitsFilter": true,
+                      "pathSkUnitsFilter": null,
+                      "sampleTime": 500
+                    }
+                  },
+                  "showMax": false,
+                  "showMin": false,
+                  "numDecimal": 1,
+                  "showMiniChart": false,
+                  "yScaleMin": 0,
+                  "yScaleMax": 25,
+                  "inverseYAxis": false,
+                  "verticalChart": false,
+                  "color": "green",
+                  "enableTimeout": false,
+                  "dataTimeout": 5,
+                  "ignoreZones": false
+                }
+              }
+            }
+          },
+          {
+            "x": 20,
+            "y": 20,
+            "w": 4,
+            "h": 4,
+            "id": "cc4ee1fc-e0ba-591d-b22e-1f648ae43d18",
+            "selector": "widget-host2",
+            "input": {
+              "widgetProperties": {
+                "type": "widget-numeric",
+                "uuid": "cc4ee1fc-e0ba-591d-b22e-1f648ae43d18",
+                "config": {
+                  "supportAutomaticHistoricalSeries": true,
+                  "displayName": "Eng Hours",
+                  "filterSelfPaths": true,
+                  "paths": {
+                    "numericPath": {
+                      "description": "Numeric Data",
+                      "path": "self.propulsion.port.runTime",
+                      "source": "default",
+                      "pathType": "number",
+                      "suppressBootstrapNull": true,
+                      "isPathConfigurable": true,
+                      "convertUnitTo": "Hours",
                       "showPathSkUnitsFilter": true,
                       "pathSkUnitsFilter": null,
                       "sampleTime": 500
@@ -1579,99 +1544,10 @@
                 }
               }
             }
-          },
-          {
-            "x": 12,
-            "y": 16,
-            "w": 6,
-            "h": 8,
-            "id": "934d43c3-1480-518c-aa71-ac143b926ace",
-            "selector": "widget-host2",
-            "input": {
-              "widgetProperties": {
-                "type": "widget-numeric",
-                "uuid": "934d43c3-1480-518c-aa71-ac143b926ace",
-                "config": {
-                  "displayName": "Hours",
-                  "filterSelfPaths": true,
-                  "paths": {
-                    "numericPath": {
-                      "description": "Numeric Data",
-                      "path": "self.propulsion.0.runTime",
-                      "source": "default",
-                      "pathType": "number",
-                      "isPathConfigurable": true,
-                      "convertUnitTo": "Hours",
-                      "showPathSkUnitsFilter": true,
-                      "pathSkUnitsFilter": null,
-                      "sampleTime": 500
-                    }
-                  },
-                  "showMax": false,
-                  "showMin": false,
-                  "numDecimal": 1,
-                  "showMiniChart": false,
-                  "yScaleMin": 0,
-                  "yScaleMax": 100,
-                  "inverseYAxis": false,
-                  "verticalChart": false,
-                  "color": "contrast",
-                  "enableTimeout": false,
-                  "dataTimeout": 5,
-                  "ignoreZones": false
-                }
-              }
-            }
-          },
-          {
-            "x": 18,
-            "y": 16,
-            "w": 6,
-            "h": 8,
-            "id": "a45d66cf-3852-5fcf-a963-b22cac5f78bd",
-            "selector": "widget-host2",
-            "input": {
-              "widgetProperties": {
-                "type": "widget-numeric",
-                "uuid": "a45d66cf-3852-5fcf-a963-b22cac5f78bd",
-                "config": {
-                  "displayName": "Fuel L",
-                  "filterSelfPaths": true,
-                  "paths": {
-                    "numericPath": {
-                      "description": "Numeric Data",
-                      "path": "self.tanks.fuel.0.currentLevel",
-                      "source": "default",
-                      "pathType": "number",
-                      "isPathConfigurable": true,
-                      "convertUnitTo": "liter",
-                      "showPathSkUnitsFilter": true,
-                      "pathSkUnitsFilter": null,
-                      "sampleTime": 500
-                    }
-                  },
-                  "showMax": false,
-                  "showMin": false,
-                  "numDecimal": 1,
-                  "showMiniChart": false,
-                  "yScaleMin": 0,
-                  "yScaleMax": 100,
-                  "inverseYAxis": false,
-                  "verticalChart": false,
-                  "color": "green",
-                  "enableTimeout": false,
-                  "dataTimeout": 5,
-                  "ignoreZones": false
-                }
-              }
-            }
           }
         ],
         "collapseSplitShell": false
       }
-    ],
-    "theme": {
-      "themeName": ""
-    }
+    ]
   }
 }
