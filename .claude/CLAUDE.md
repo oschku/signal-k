@@ -27,14 +27,15 @@ Each tick (1 Hz) the sim encodes the following N2K PGNs as binary payloads,
 wraps them in `$PCDIN,<pgn-hex>,<time>,<src>,<data-hex>*<cs>` sentences, and
 streams them over TCP to any connected client.
 
+Sim emits only the PGNs the MFS30D actually produces (no oil pressure/temp,
+no fuel-tank sender, no depth sounder).
+
 | PGN    | Name                            | Fields emitted |
 |--------|---------------------------------|----------------|
 | 127488 | Engine Params, Rapid Update     | RPM, trim |
-| 127489 | Engine Params, Dynamic          | coolant temp, oil pressure/temp, alternator voltage, fuel rate, engine hours |
-| 127505 | Fluid Level                     | fuel tank level %, capacity |
+| 127489 | Engine Params, Dynamic          | coolant temp, alternator voltage, fuel rate, engine hours (oil fields N/A) |
 | 127508 | Battery Status                  | voltage |
-| 128267 | Water Depth                     | depth |
-| 129025 | Position, Rapid Update          | lat, lon |
+| 129025 | Position, Rapid Update          | lat, lon (dev/test only — production uses the FZ-G1's u-blox GPS via the OS) |
 | 129026 | COG & SOG, Rapid Update         | COG (rad), SOG (m/s) |
 
 Signal K's NMEA 0183 pipeline auto-detects `$PCDIN` and routes it through
@@ -58,26 +59,129 @@ Port `10110` is typically already bound by signalk-server itself; use `10111`
 
 All values stored in SI; KIP converts for display.
 
-| Signal K path | SI unit | Display | Source PGN |
+| Signal K path | SI unit | Display | Source |
 |---|---|---|---|
-| `propulsion.0.revolutions` | Hz | RPM (×60) | 127488 |
-| `propulsion.0.trim` | ratio 0–1 | % | 127488 |
-| `propulsion.0.coolantTemperature` | K | °C (−273.15) | 127489 |
-| `propulsion.0.fuel.rate` | m³/s | L/h (×3.6e6) | 127489 |
-| `propulsion.0.runTime` | s | hours | 127489 |
-| `electrical.batteries.0.voltage` | V | V | 127489 / 127508 |
-| `tanks.fuel.0.currentLevel` | ratio 0–1 | % | 127505 |
-| `tanks.fuel.0.capacity` | m³ | L (×1000) | 127505 |
-| `environment.depth.belowTransducer` | m | m | 128267 |
-| `navigation.position` | {lat,lon} deg | deg | 129025 |
-| `navigation.speedOverGround` | m/s | kn (×1.944) | 129026 |
-| `navigation.courseOverGroundTrue` | rad | ° (×57.3) | 129026 |
+| `propulsion.port.revolutions` | Hz | RPM (×60) | PGN 127488 |
+| `propulsion.port.drive.trimState` | ratio 0–1 | % | PGN 127488 |
+| `propulsion.port.temperature` | K | °C (−273.15) | PGN 127489 |
+| `propulsion.port.fuel.rate` | m³/s | L/h (×3.6e6) | PGN 127489 |
+| `propulsion.port.runTime` | s | hours | PGN 127489 |
+| `propulsion.port.alternatorVoltage` | V | V | PGN 127489 |
+| `propulsion.port.slip` | ratio 0–1 | % | signalk-slippage |
+| `propulsion.port.theoreticalSpeed` | m/s | kn (×1.944) | signalk-slippage |
+| `electrical.batteries.0.voltage` | V | V | PGN 127508 |
+| `tanks.fuel.0.capacity` | m³ | L (×1000) | signalk-fuel-monitor |
+| `tanks.fuel.0.currentVolume` | m³ | L (×1000) | signalk-fuel-monitor |
+| `tanks.fuel.0.currentLevel` | ratio 0–1 | % | signalk-fuel-monitor |
+| `tanks.fuel.0.timeRange` | s | Hours | signalk-fuel-monitor |
+| `tanks.fuel.0.distanceRange` | m | nm | signalk-fuel-monitor |
+| `tanks.fuel.0.distancePerFuel` | m/m³ | nm/L | signalk-fuel-monitor |
+| `tanks.fuel.0.fuelPerDistance` | m³/m | L/nm (×1,852,000) | signalk-fuel-monitor |
+| `navigation.position` | {lat,lon} deg | deg | OS GPS (FZ-G1 u-blox) — PGN 129025 in sim |
+| `navigation.speedOverGround` | m/s | kn (×1.944) | PGN 129026 |
+| `navigation.courseOverGroundTrue` | rad | ° (×57.3) | PGN 129026 |
 
-### Engine notes (MFS30DETL-specific)
-- ECU only powers when engine is running, not key-on → no data until engine starts
-- No oil pressure sensor on this engine class → oil pressure always N/A
-- Fuel level is calculated by `signalk-fuel-monitor` integrating `fuel.rate` over
-  time (portable tank, no physical sender)
+### Engine notes (MFS30D / MFS30DETL-specific)
+- ECU only powers when engine is running, not key-on → no data until engine starts.
+- No oil pressure or oil temperature sensor on this engine class → those fields
+  are always N/A.
+- No fuel-tank sender (portable 25 L tank) → `signalk-fuel-monitor` derives
+  `tanks.fuel.0.currentLevel` by integrating `fuel.rate` over time, with a
+  PUT-based refill handler.
+- No depth sounder fitted → no `environment.depth.belowTransducer`.
+- Position comes from the FZ-G1 tablet's built-in u-blox GPS (Windows location
+  service); the sim emits PGN 129025 only for development.
+- `@signalk/n2k-signalk` maps engine instance 0 → `propulsion.port` (not `.0`),
+  and uses `drive.trimState` for tilt/trim and `temperature` for coolant.
+  Use the `propulsion.port.*` paths everywhere downstream (dashboards, plugins).
+
+---
+
+## KIP Dashboards
+
+Four dashboards generated from [scripts/build_kip_config.py](../scripts/build_kip_config.py):
+
+| Dashboard  | Focus | Key widgets |
+|---|---|---|
+| Underway   | planing / cruising      | RPM radial 0–7000, SOG, prop slip, fuel %, coolant, voltage, trim, hours, fuel rate, **Refilled** button |
+| Trolling   | low-speed fishing       | big precise SOG (1 dec), COG compass, 10 min SOG chart, position, RPM, trim, fuel % |
+| Navigation | passage planning        | COG compass, position, SOG, 30 min SOG chart, local clock, voltage, heading |
+| Engine     | diagnostics + slippage  | prop slip %, slip 30 min chart, RPM/fuel rate/coolant history, voltage, hours, fuel L |
+
+History is captured via dataSets (defined in `app.dataSets`) for SOG, RPM, fuel
+rate, coolant, voltage, slip, fuel remaining. Periods are tuned per metric
+(e.g. fuel rate over 1 h, slip over 30 min).
+
+**Regenerate** after editing `scripts/build_kip_config.py`:
+```bash
+python3 scripts/build_kip_config.py    # rewrites signalk-config/applicationData/users/admin/kip/11.0.0.json
+```
+KIP requires a hard browser refresh to pick up server-side config changes.
+
+### Day / night theme
+- `app.autoNightMode: true` — auto-flips at sunset/sunrise based on `navigation.position`.
+- The KIP top-bar has a manual day/night toggle (sun/moon icon) regardless.
+- `redNightMode` adds a red filter on top of the night theme to preserve dark adaptation.
+- `themeName: ""` uses KIP 3's Material 3 dynamic theme (follows system preference).
+
+---
+
+## Custom plugins
+
+Both plugins live under [plugins/](../plugins/) and are wired into
+`signalk-config/package.json` as relative-path deps:
+
+```json
+"signalk-fuel-monitor": "file:../plugins/signalk-fuel-monitor",
+"signalk-slippage":     "file:../plugins/signalk-slippage"
+```
+
+A plain `npm install` from `signalk-config/` puts both into `node_modules/`,
+which is where Signal K's plugin-discovery code looks (per
+[Publishing to the AppStore](https://demo.signalk.org/documentation/Developing/Plugins/Publishing_to_The_AppStore.html)
+the `signalk-node-server-plugin` keyword is what makes the package eligible).
+Then enable each in **Server → Plugin Config**.
+
+### signalk-slippage ([plugins/signalk-slippage/](../plugins/signalk-slippage/))
+
+Computes prop slip from RPM, gear ratio, prop pitch, and SOG. Defaults match
+the Tohatsu MFS30DETL + Quicksilver 410 (gear 2.17:1, 13" pitch, SOG-based).
+Publishes `propulsion.port.slip` (ratio) and `propulsion.port.theoreticalSpeed` (m/s).
+
+```
+propRPM            = engineRPM / gearRatio
+theoreticalSpeed   = propRPM * pitch_m / 60
+slip               = clamp(1 - actualSpeed / theoreticalSpeed, 0, 1)
+```
+
+Below `minRpm` (default 1500) the plugin holds slip null — the prop is too
+lightly loaded for the formula to be meaningful.
+
+### signalk-fuel-monitor ([plugins/signalk-fuel-monitor/](../plugins/signalk-fuel-monitor/))
+
+Replaces the missing tank sender. Subscribes to `propulsion.port.fuel.rate`
+and `navigation.speedOverGround`, integrates over wall-clock time, and publishes:
+
+| Path | SI unit | KIP display |
+|---|---|---|
+| `tanks.fuel.0.capacity` | m³ | L |
+| `tanks.fuel.0.currentVolume` | m³ | L (absolute remaining) |
+| `tanks.fuel.0.currentLevel` | ratio | % |
+| `tanks.fuel.0.timeRange` | s | Hours remaining at current burn |
+| `tanks.fuel.0.distanceRange` | m | nm until empty at current speed + burn |
+| `tanks.fuel.0.distancePerFuel` | m/m³ | nm/L (KIP "Fuel Distance" category) |
+| `tanks.fuel.0.fuelPerDistance` | m³/m | L/nm (× 1,852,000 to display) |
+
+Range/economy outputs are suppressed below configurable rate (`minFuelRateLph`,
+default 0.5 L/h) and SOG (`minSogKnots`, default 0.5 kn) thresholds.
+
+State persists to the plugin data dir so the estimate survives restarts.
+
+Refill handlers (PUT) — pick whichever the UI uses:
+- `tanks.fuel.0.refill` — any truthy value resets to capacity (the KIP
+  "Refilled" boolean-switch on the Underway dashboard is wired to this).
+- `tanks.fuel.0.currentVolume` — set m³ explicitly (e.g. `0.025` = 25 L).
+- `tanks.fuel.0.currentLevel` — set ratio 0..1.
 
 ---
 
@@ -91,11 +195,17 @@ signal-k/
 ├── docs/
 │   ├── data-flow.md           # N2K → PCDIN → Signal K technical deep-dive
 │   └── project-context.md     # hardware, budget, deployment, dashboard layouts
+├── plugins/
+│   ├── signalk-fuel-monitor/  # rate-integrated fuel level + refill PUT
+│   └── signalk-slippage/      # derived prop slip + theoretical speed
+├── scripts/
+│   └── build_kip_config.py    # generates the KIP dashboard JSON
 ├── signalk-config/            # Signal K data directory
 │   ├── settings.json
 │   ├── security.json
-│   └── plugin-config-data/
-│       └── kip-config.json    # KIP dashboard layout (primary deliverable)
+│   ├── plugin-config-data/
+│   └── applicationData/
+│       └── users/admin/kip/11.0.0.json   # KIP dashboards (generated)
 ├── sim.py                     # PCDIN/N2K gateway simulator
 ├── signalk-server             # launch wrapper
 └── package.json
@@ -109,5 +219,7 @@ signal-k/
 - **Secure mode** — PCDIN over NMEA 0183 TCP bypasses auth entirely (Signal K
   connects out to the sim), so secure mode does not affect data ingestion.
 - **KIP caches layouts** — hard-refresh browser (Ctrl+Shift+R) if config changes don't appear.
+- **KIP shared config name** — the dashboards file lives under the active config
+  name (default: `default`). If you rename it in KIP, regenerate with the new name.
 - **signalk-config vs ~/.signalk** — server is launched with `--configdir ./signalk-config`;
   plugins save state there, not to the global default.

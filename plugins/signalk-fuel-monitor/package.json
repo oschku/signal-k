@@ -1,0 +1,12 @@
+{
+  "name": "signalk-fuel-monitor",
+  "version": "0.1.2",
+  "description": "Estimate fuel level by integrating engine fuel rate. Adds a refill button (PUT) to reset to full when the portable tank is replaced/refilled.",
+  "main": "index.js",
+  "keywords": [
+    "signalk-node-server-plugin",
+    "signalk-category-instruments"
+  ],
+  "author": "Quicksilver 410 build",
+  "license": "MIT"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "signalk-slippage",
+  "version": "0.1.1",
+  "description": "Compute prop slippage from RPM, gear ratio, prop pitch, and SOG.",
+  "main": "index.js",
+  "keywords": ["signalk-node-server-plugin", "signalk-category-derived-data"],
+  "author": "Quicksilver 410 build",
+  "license": "MIT"
+}

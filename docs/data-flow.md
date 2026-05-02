@@ -33,10 +33,12 @@ The MFS30DETL ECU connects to the N2K backbone via the Tohatsu data cable
 |--------|-------------|--------|
 | 127488 | 100 ms | Engine Instance, Speed (RPM), Boost Pressure, Tilt/Trim |
 | 127489 | 500 ms | Instance, Oil Pressure*, Oil Temp*, Coolant Temp, Alternator Voltage, Fuel Rate, Engine Hours, Discrete Status |
-| 127505 | 2.5 s  | Instance, Type (Fuel=0), Level %, Capacity L |
 
-*Oil pressure and temperature are **not fitted** on the MFS30DETL — the fields
-are present in PGN 127489 but always report "not available" (0xFFFF sentinel).
+*Oil pressure and oil temperature are **not fitted** on the MFS30D — the
+fields exist in PGN 127489 but always report "not available" (0xFFFF sentinel).
+The boat also has no PGN 127505 (no fuel-tank sender — portable 25 L tank,
+fuel level is derived by the `signalk-fuel-monitor` plugin) and no PGN 128267
+(no depth sounder).
 
 NMEA 2000 uses ISO 11783-3 (CAN) at 250 kbit/s.  Every field has a defined
 resolution and unit in the canboat PGN definitions:
@@ -134,21 +136,31 @@ Signal K server (Node.js) consumes the TCP stream via the
 
 `@signalk/n2k-signalk` maps each decoded PGN field to a Signal K path:
 
+Engine instance 0 maps to `propulsion.port.*` (1 → `starboard`, etc.). Several
+field names also differ from what you'd guess from the PGN: tilt/trim lives at
+`drive.trimState`, coolant at `temperature` (not `coolantTemperature`), and the
+alternator output appears at `propulsion.port.alternatorVoltage` in addition to
+`electrical.batteries.0.voltage` from PGN 127508.
+
 | PGN + field | Signal K path | Conversion |
 |---|---|---|
-| 127488 Speed | `propulsion.0.revolutions` | RPM → Hz (/60) |
-| 127488 Tilt/Trim | `propulsion.0.trim` | % → ratio (/100) |
-| 127489 Temperature | `propulsion.0.coolantTemperature` | K (native) |
-| 127489 Alternator Potential | `electrical.batteries.0.voltage` | V (native) |
-| 127489 Fuel Rate | `propulsion.0.fuel.rate` | L/h → m³/s (/3.6e6) |
-| 127489 Total Engine Hours | `propulsion.0.runTime` | s (native) |
-| 127505 Level | `tanks.fuel.0.currentLevel` | % → ratio (/100) |
-| 127505 Capacity | `tanks.fuel.0.capacity` | L → m³ (/1000) |
+| 127488 Speed | `propulsion.port.revolutions` | RPM → Hz (/60) |
+| 127488 Tilt/Trim | `propulsion.port.drive.trimState` | % → ratio (/100) |
+| 127489 Temperature | `propulsion.port.temperature` | K (native) |
+| 127489 Alternator Potential | `propulsion.port.alternatorVoltage` | V (native) |
+| 127489 Fuel Rate | `propulsion.port.fuel.rate` | L/h → m³/s (/3.6e6) |
+| 127489 Total Engine Hours | `propulsion.port.runTime` | s (native) |
+| 127489 Oil Pressure | `propulsion.port.oilPressure` | Pa (always N/A on MFS30D) |
+| 127489 Oil Temperature | `propulsion.port.oilTemperature` | K (always N/A on MFS30D) |
 | 127508 Voltage | `electrical.batteries.0.voltage` | V (native) |
-| 128267 Depth | `environment.depth.belowTransducer` | m (native) |
 | 129025 Latitude/Longitude | `navigation.position` | degrees (native) |
 | 129026 SOG | `navigation.speedOverGround` | m/s (native) |
 | 129026 COG | `navigation.courseOverGroundTrue` | rad (native) |
+
+PGN 127505 (Fluid Level) and PGN 128267 (Water Depth) are absent on this
+boat — the corresponding Signal K paths come from the
+`signalk-fuel-monitor` plugin (rate-integrated fuel level) and are not
+populated for depth (`environment.depth.belowTransducer`).
 
 ---
 
@@ -170,8 +182,8 @@ struct.pack("<BHHbBB",
 # PGN 127489 — 26 bytes (coalesced multi-frame, no Fast Packet split needed)
 struct.pack("<BHHHhhIHHBHHbb",
     instance,                         # uint8
-    int(oil_pa / 100) & 0xFFFF,       # uint16 hPa
-    int(oil_k * 10) & 0xFFFF,         # uint16 0.1 K
+    0xFFFF,                           # oil pressure: N/A on MFS30D
+    0xFFFF,                           # oil temperature: N/A on MFS30D
     int(coolant_k * 100) & 0xFFFF,    # uint16 0.01 K
     int(voltage * 100),               # int16 0.01 V
     int(fuel_lph * 10),               # int16 0.1 L/h
@@ -184,7 +196,7 @@ struct.pack("<BHHHhhIHHBHHbb",
 ```
 
 Verified by piping output through `@canboat/canboatjs` `FromPgn.parseN2KOver0183()`
-— all 7 PGNs decode to correct physical values.
+— all 5 PGNs decode to correct physical values.
 
 ---
 

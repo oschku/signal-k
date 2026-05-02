@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Boat data simulator that mimics a Tohatsu outboard connected to the
+Boat data simulator that mimics a Tohatsu MFS30D outboard connected to the
 wellenvogel esp32-nmea2000 WiFi gateway
 (https://github.com/wellenvogel/esp32-nmea2000).
 
@@ -11,14 +11,20 @@ auto-detects `$PCDIN`/`$MXPGN` and routes them through canboatjs for full
 PGN decoding (see signalk-server's `@signalk/streams/nmea0183-signalk.js`,
 function `isN2KOver0183`).
 
-PGNs simulated
+PGNs simulated (only what the MFS30D actually publishes)
   127488  Engine Parameters, Rapid Update  (RPM, trim)
-  127489  Engine Parameters, Dynamic       (coolant, oil, voltage, fuel rate, hours)
-  127505  Fluid Level                      (fuel tank)
+  127489  Engine Parameters, Dynamic       (coolant, voltage, fuel rate, hours)
   127508  Battery Status                   (house/start battery voltage)
-  128267  Water Depth
-  129025  Position, Rapid Update
+  129025  Position, Rapid Update           (used in dev only; production GPS
+                                            comes from the Windows OS sensor)
   129026  COG & SOG, Rapid Update
+
+Sensors NOT on the MFS30D and therefore NOT simulated:
+  - Oil pressure / oil temperature  (PGN 127489 fields → N/A sentinels)
+  - Fluid Level / fuel tank sender  (PGN 127505 omitted; portable 25L tank,
+    fuel remaining is derived by the signalk-fuel-monitor plugin from
+    integrating fuel rate)
+  - Water depth                     (PGN 128267 omitted; no transducer)
 
 Configure Signal K -> Server -> Connections:
   Type:    NMEA 0183
@@ -56,14 +62,18 @@ def pgn_127488(rpm: float, trim_pct: float, instance: int = 0) -> bytes:
 
 
 def pgn_127489(coolant_k: float, voltage: float, fuel_lph: float,
-               hours_s: float, oil_pa: float, oil_k: float,
-               instance: int = 0) -> bytes:
-    """Engine Parameters, Dynamic — 26 bytes (multi-frame, sent coalesced)."""
+               hours_s: float, instance: int = 0) -> bytes:
+    """Engine Parameters, Dynamic — 26 bytes (multi-frame, sent coalesced).
+
+    Oil pressure and oil temperature are not fitted on the MFS30D and are
+    emitted as their N/A sentinels (0xFFFF) so canboatjs decodes them as
+    'not available' rather than 0 bar / 0 K.
+    """
     return struct.pack(
         "<BHHHhhIHHBHHbb",
         instance,
-        int(round(oil_pa / 100)) & 0xFFFF,                  # uint16 hPa
-        int(round(oil_k * 10)) & 0xFFFF,                    # uint16 0.1 K
+        0xFFFF,                                             # oil pressure: N/A
+        0xFFFF,                                             # oil temperature: N/A
         int(round(coolant_k * 100)) & 0xFFFF,               # uint16 0.01 K
         max(-32768, min(32767, int(round(voltage * 100)))), # int16 0.01 V
         max(-32768, min(32767, int(round(fuel_lph * 10)))), # int16 0.1 L/h
@@ -72,19 +82,6 @@ def pgn_127489(coolant_k: float, voltage: float, fuel_lph: float,
         0xFF,                                               # reserved
         0x0000, 0x0000,                                     # discrete status 1/2
         0x7F, 0x7F,                                         # load/torque N/A
-    )
-
-
-def pgn_127505(level_pct: float, capacity_l: float,
-               instance: int = 0, fluid_type: int = 0) -> bytes:
-    """Fluid Level — 8 bytes. fluid_type 0=Fuel."""
-    type_inst = ((fluid_type & 0x0F) << 4) | (instance & 0x0F)
-    return struct.pack(
-        "<BhIB",
-        type_inst,
-        max(-32768, min(32767, int(round(level_pct * 250)))),  # int16 0.004 %
-        int(round(capacity_l * 10)) & 0xFFFFFFFF,              # uint32 0.1 L
-        0xFF,                                                  # reserved
     )
 
 
@@ -97,17 +94,6 @@ def pgn_127508(voltage: float, instance: int = 0) -> bytes:
         0x7FFF,                                              # current N/A
         0xFFFF,                                              # temp N/A
         0xFF,                                                # SID
-    )
-
-
-def pgn_128267(depth_m: float) -> bytes:
-    """Water Depth — 8 bytes."""
-    return struct.pack(
-        "<BIhB",
-        0xFF,                                            # SID
-        int(round(depth_m * 100)) & 0xFFFFFFFF,          # uint32 0.01 m
-        0,                                               # offset 0.001 m
-        0xFF,                                            # range N/A
     )
 
 
@@ -153,11 +139,19 @@ def encode_pcdin(pgn: int, data: bytes, src: int = N2K_SRC) -> str:
 # ─── Simulator ──────────────────────────────────────────────────────────────
 
 class BoatSim:
+    # Coolant thermal model constants
+    COOLANT_AMBIENT_C = 15.0   # Finnish summer ambient / initial temp
+    COOLANT_TAU_S = 150.0      # thermal time constant (seconds)
+    #   equilibrium temp is load-dependent:
+    #     idle (~850 RPM)  → ~62 °C
+    #     cruise (5500 RPM)→ ~78 °C
+    #     WOT  (6200 RPM)  → ~83 °C
+    #   formula: T_eq = 58 + 26 × (rpm / 7000)
+
     def __init__(self, scenario="cruise"):
         self.scenario = scenario
         self.t = 0
-        self.fuel_remaining_l = 25.0
-        self.tank_capacity_l = 25.0
+        self.coolant_c = self.COOLANT_AMBIENT_C  # starts cold
         self.engine_hours = 137.5
         self.lat = 60.1234
         self.lon = 24.4321
@@ -182,11 +176,17 @@ class BoatSim:
             rpm = 1000
 
         fuel_rate_lph = 0.04 + 0.000000035 * (rpm ** 2.7)
-        coolant_c = min(75.0, 18.0 + self.t * 0.18)
+
+        # Coolant: exponential approach to a load-dependent equilibrium.
+        # Each 1-second tick: T += (T_eq - T) × (1 − e^(−dt/τ))
+        # This gives a rapid rise from cold, gradually slowing near operating temp.
+        t_eq = 58.0 + 26.0 * (rpm / 7000.0)
+        alpha = 1.0 - math.exp(-1.0 / self.COOLANT_TAU_S)  # ≈ 0.00664 per tick
+        self.coolant_c += (t_eq - self.coolant_c) * alpha
+        coolant_c = self.coolant_c
+
         trim_pct = 35 + 10 * math.sin(self.t / 60)
         voltage = 14.2 if rpm > 800 else 12.6
-
-        self.fuel_remaining_l = max(0, self.fuel_remaining_l - fuel_rate_lph / 3600.0)
 
         sog_knots = max(0, (rpm - 1200) / 250)
         sog_ms = sog_knots * 0.5144
@@ -200,8 +200,6 @@ class BoatSim:
         if rpm > 800:
             self.engine_hours += 1.0 / 3600.0
 
-        depth_m = 8.0 + 5.0 * math.sin(self.t / 45)
-
         return {
             "rpm": rpm,
             "fuel_rate_lph": fuel_rate_lph,
@@ -210,7 +208,6 @@ class BoatSim:
             "voltage": voltage,
             "sog_knots": sog_knots,
             "sog_ms": sog_ms,
-            "depth_m": depth_m,
         }
 
     def make_sentences(self, s: dict) -> list[str]:
@@ -221,15 +218,8 @@ class BoatSim:
                 voltage=s["voltage"],
                 fuel_lph=s["fuel_rate_lph"],
                 hours_s=self.engine_hours * 3600,
-                oil_pa=300_000,           # ~3 bar typical idle
-                oil_k=80 + 273.15,
-            )),
-            encode_pcdin(127505, pgn_127505(
-                level_pct=self.fuel_remaining_l / self.tank_capacity_l * 100,
-                capacity_l=self.tank_capacity_l,
             )),
             encode_pcdin(127508, pgn_127508(s["voltage"])),
-            encode_pcdin(128267, pgn_128267(s["depth_m"])),
             encode_pcdin(129025, pgn_129025(self.lat, self.lon)),
             encode_pcdin(129026, pgn_129026(math.radians(self.heading_deg), s["sog_ms"])),
         ]
@@ -279,7 +269,6 @@ class BoatSim:
                         print(
                             f"  t={self.t}s  clients={len(self.clients)}"
                             f"  rpm={s['rpm']:.0f}  sog={s['sog_knots']:.1f}kn"
-                            f"  fuel={self.fuel_remaining_l:.1f}L"
                             f"  hours={self.engine_hours:.2f}"
                         )
                     self.t += 1

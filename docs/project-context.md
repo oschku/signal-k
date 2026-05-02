@@ -106,7 +106,7 @@ veneilijantähti.fi (~€30–40 for basic kit).
   "uuid": "<uuid4>",
   "type": "gauge-radial",
   "options": {
-    "paths": { "gaugePath": "self.propulsion.0.revolutions" },
+    "paths": { "gaugePath": "self.propulsion.port.revolutions" },
     "gaugeScale": { "min": 0, "max": 7000, "decimals": 0 },
     "gaugeUnits": "RPM",
     "title": "Engine RPM",

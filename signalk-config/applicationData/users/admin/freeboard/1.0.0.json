@@ -49,8 +49,8 @@
   "map": {
     "zoomLevel": 2,
     "center": [
-      143.78498069193202,
-      15.87086087656138
+      0,
+      0
     ],
     "rotation": 0,
     "lockMoveMap": true,
@@ -72,7 +72,9 @@
         "OBSTRN",
         "UWTROC",
         "WRECKS",
-        "DEPCNT"
+        "DEPCNT",
+        "RIVERS",
+        "LAKARE"
       ],
       "depthUnit": "m"
     },
@@ -160,6 +162,7 @@
       "openstreetmap",
       "openseamap"
     ],
+    "chartOpacity": {},
     "aisTargets": null,
     "aisTargetTypes": [],
     "aisFilterByShipType": false,
