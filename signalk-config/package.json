@@ -7,12 +7,17 @@
   "dependencies": {
     "@mxtommy/kip": "^4.8.0",
     "@signalk/app-dock": "^0.3.3",
-    "@signalk/freeboard-sk": "^2.22.0",
+    "@signalk/freeboard-sk": "^2.22.1",
     "@signalk/signalk-to-nmea0183": "^1.16.1",
     "fuel-usage-calculator": "^0.1.0",
+    "signalk-aisstream": "^0.8.0",
+    "signalk-dashboard": "^0.4.6",
     "signalk-derived-data": "^1.44.1",
     "signalk-fuel-monitor": "file:../plugins/signalk-fuel-monitor",
     "signalk-n2kais-to-nmea0183": "^2.0.3",
-    "signalk-slippage": "file:../plugins/signalk-slippage"
+    "signalk-net-weather-finland": "^1.0.0",
+    "signalk-slippage": "file:../plugins/signalk-slippage",
+    "signalk-solunar": "file:../plugins/signalk-solunar",
+    "signalk-virtual-weather-sensors": "^1.2.2"
   }
 }

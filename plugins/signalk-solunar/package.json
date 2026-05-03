@@ -1,0 +1,12 @@
+{
+  "name": "signalk-solunar",
+  "version": "0.1.0",
+  "description": "Sunrise/sunset, moon phase, and solunar fishing periods for the current position.",
+  "main": "index.js",
+  "keywords": ["signalk-node-server-plugin", "signalk-category-derived-data"],
+  "author": "Quicksilver 410 build",
+  "license": "MIT",
+  "dependencies": {
+    "suncalc": "^1.9.0"
+  }
+}

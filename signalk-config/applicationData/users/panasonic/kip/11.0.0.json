@@ -1603,6 +1603,515 @@
           }
         ],
         "collapseSplitShell": false
+      },
+      {
+        "id": "cb63ade3-55a6-5fb9-a67e-0c2cc0c4fe26",
+        "name": "Fishing",
+        "icon": "dashboard-sailing",
+        "configuration": [
+          {
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 10,
+            "id": "1e6183b0-db94-5277-abb5-bee2767e94e3",
+            "selector": "widget-host2",
+            "input": {
+              "widgetProperties": {
+                "type": "widget-gauge-ng-radial",
+                "uuid": "1e6183b0-db94-5277-abb5-bee2767e94e3",
+                "config": {
+                  "supportAutomaticHistoricalSeries": true,
+                  "displayName": "Solunar Rating",
+                  "filterSelfPaths": true,
+                  "paths": {
+                    "gaugePath": {
+                      "description": "Numeric Data",
+                      "path": "self.environment.solunar.rating",
+                      "source": "default",
+                      "pathType": "number",
+                      "suppressBootstrapNull": true,
+                      "isPathConfigurable": true,
+                      "showPathSkUnitsFilter": true,
+                      "pathSkUnitsFilter": null,
+                      "convertUnitTo": "unitless",
+                      "sampleTime": 500
+                    }
+                  },
+                  "displayScale": {
+                    "lower": 0,
+                    "upper": 4,
+                    "type": "linear"
+                  },
+                  "gauge": {
+                    "type": "ngRadial",
+                    "subType": "measuring",
+                    "enableTicks": true,
+                    "enableNeedle": true,
+                    "enableProgressbar": true,
+                    "highlightsWidth": 5,
+                    "scaleStart": 180,
+                    "barStartPosition": "left"
+                  },
+                  "numInt": 1,
+                  "numDecimal": 1,
+                  "enableTimeout": false,
+                  "color": "green",
+                  "dataTimeout": 5,
+                  "ignoreZones": false
+                }
+              }
+            }
+          },
+          {
+            "x": 12,
+            "y": 0,
+            "w": 6,
+            "h": 5,
+            "id": "6f5fbf38-9401-5e78-8b42-c719d546eb8a",
+            "selector": "widget-host2",
+            "input": {
+              "widgetProperties": {
+                "type": "widget-text",
+                "uuid": "6f5fbf38-9401-5e78-8b42-c719d546eb8a",
+                "config": {
+                  "displayName": "Rating",
+                  "filterSelfPaths": true,
+                  "paths": {
+                    "stringPath": {
+                      "description": "String Data",
+                      "path": "self.environment.solunar.ratingName",
+                      "source": "default",
+                      "pathType": "string",
+                      "isPathConfigurable": true,
+                      "sampleTime": 500
+                    }
+                  },
+                  "color": "green",
+                  "enableTimeout": false,
+                  "dataTimeout": 5
+                }
+              }
+            }
+          },
+          {
+            "x": 18,
+            "y": 0,
+            "w": 6,
+            "h": 5,
+            "id": "fd643e60-3b7a-5d89-994d-be6a3296c1db",
+            "selector": "widget-host2",
+            "input": {
+              "widgetProperties": {
+                "type": "widget-text",
+                "uuid": "fd643e60-3b7a-5d89-994d-be6a3296c1db",
+                "config": {
+                  "displayName": "Active Period",
+                  "filterSelfPaths": true,
+                  "paths": {
+                    "stringPath": {
+                      "description": "String Data",
+                      "path": "self.environment.solunar.activeKind",
+                      "source": "default",
+                      "pathType": "string",
+                      "isPathConfigurable": true,
+                      "sampleTime": 500
+                    }
+                  },
+                  "color": "orange",
+                  "enableTimeout": false,
+                  "dataTimeout": 5
+                }
+              }
+            }
+          },
+          {
+            "x": 12,
+            "y": 5,
+            "w": 6,
+            "h": 5,
+            "id": "40c0e60d-a22c-50fe-8d1a-a86a2c676b00",
+            "selector": "widget-host2",
+            "input": {
+              "widgetProperties": {
+                "type": "widget-text",
+                "uuid": "40c0e60d-a22c-50fe-8d1a-a86a2c676b00",
+                "config": {
+                  "displayName": "Moon Phase",
+                  "filterSelfPaths": true,
+                  "paths": {
+                    "stringPath": {
+                      "description": "String Data",
+                      "path": "self.environment.moon.phaseName",
+                      "source": "default",
+                      "pathType": "string",
+                      "isPathConfigurable": true,
+                      "sampleTime": 500
+                    }
+                  },
+                  "color": "contrast",
+                  "enableTimeout": false,
+                  "dataTimeout": 5
+                }
+              }
+            }
+          },
+          {
+            "x": 18,
+            "y": 5,
+            "w": 6,
+            "h": 5,
+            "id": "b2ce848d-7be6-50db-a06c-a75e80d85758",
+            "selector": "widget-host2",
+            "input": {
+              "widgetProperties": {
+                "type": "widget-numeric",
+                "uuid": "b2ce848d-7be6-50db-a06c-a75e80d85758",
+                "config": {
+                  "supportAutomaticHistoricalSeries": true,
+                  "displayName": "Illumination",
+                  "filterSelfPaths": true,
+                  "paths": {
+                    "numericPath": {
+                      "description": "Numeric Data",
+                      "path": "self.environment.moon.illumination",
+                      "source": "default",
+                      "pathType": "number",
+                      "suppressBootstrapNull": true,
+                      "isPathConfigurable": true,
+                      "convertUnitTo": "percent",
+                      "showPathSkUnitsFilter": true,
+                      "pathSkUnitsFilter": null,
+                      "sampleTime": 500
+                    }
+                  },
+                  "showMax": false,
+                  "showMin": false,
+                  "numDecimal": 0,
+                  "showMiniChart": false,
+                  "yScaleMin": 0,
+                  "yScaleMax": 100,
+                  "inverseYAxis": false,
+                  "verticalChart": false,
+                  "color": "contrast",
+                  "enableTimeout": false,
+                  "dataTimeout": 5,
+                  "ignoreZones": false
+                }
+              }
+            }
+          },
+          {
+            "x": 0,
+            "y": 10,
+            "w": 6,
+            "h": 8,
+            "id": "8f33260c-d92c-5d54-a414-888e38683a5e",
+            "selector": "widget-host2",
+            "input": {
+              "widgetProperties": {
+                "type": "widget-datetime",
+                "uuid": "8f33260c-d92c-5d54-a414-888e38683a5e",
+                "config": {
+                  "displayName": "Sunrise",
+                  "filterSelfPaths": true,
+                  "paths": {
+                    "gaugePath": {
+                      "description": "Date / Time",
+                      "path": "self.environment.sun.sunrise",
+                      "source": "default",
+                      "pathType": "Date",
+                      "isPathConfigurable": true,
+                      "sampleTime": 1000
+                    }
+                  },
+                  "dateFormat": "HH:mm",
+                  "dateTimezone": "Europe/Helsinki",
+                  "color": "yellow",
+                  "enableTimeout": false,
+                  "dataTimeout": 5
+                }
+              }
+            }
+          },
+          {
+            "x": 6,
+            "y": 10,
+            "w": 6,
+            "h": 8,
+            "id": "781c32bf-43ac-55cd-b283-7e1730938261",
+            "selector": "widget-host2",
+            "input": {
+              "widgetProperties": {
+                "type": "widget-datetime",
+                "uuid": "781c32bf-43ac-55cd-b283-7e1730938261",
+                "config": {
+                  "displayName": "Sunset",
+                  "filterSelfPaths": true,
+                  "paths": {
+                    "gaugePath": {
+                      "description": "Date / Time",
+                      "path": "self.environment.sun.sunset",
+                      "source": "default",
+                      "pathType": "Date",
+                      "isPathConfigurable": true,
+                      "sampleTime": 1000
+                    }
+                  },
+                  "dateFormat": "HH:mm",
+                  "dateTimezone": "Europe/Helsinki",
+                  "color": "orange",
+                  "enableTimeout": false,
+                  "dataTimeout": 5
+                }
+              }
+            }
+          },
+          {
+            "x": 12,
+            "y": 10,
+            "w": 6,
+            "h": 8,
+            "id": "6fe3d8e7-64f5-56c1-a7cb-da56d7c5b89e",
+            "selector": "widget-host2",
+            "input": {
+              "widgetProperties": {
+                "type": "widget-datetime",
+                "uuid": "6fe3d8e7-64f5-56c1-a7cb-da56d7c5b89e",
+                "config": {
+                  "displayName": "Moonrise",
+                  "filterSelfPaths": true,
+                  "paths": {
+                    "gaugePath": {
+                      "description": "Date / Time",
+                      "path": "self.environment.moon.moonrise",
+                      "source": "default",
+                      "pathType": "Date",
+                      "isPathConfigurable": true,
+                      "sampleTime": 1000
+                    }
+                  },
+                  "dateFormat": "HH:mm",
+                  "dateTimezone": "Europe/Helsinki",
+                  "color": "blue",
+                  "enableTimeout": false,
+                  "dataTimeout": 5
+                }
+              }
+            }
+          },
+          {
+            "x": 18,
+            "y": 10,
+            "w": 6,
+            "h": 8,
+            "id": "870e0288-0c55-5b38-a68a-bd8f91445781",
+            "selector": "widget-host2",
+            "input": {
+              "widgetProperties": {
+                "type": "widget-datetime",
+                "uuid": "870e0288-0c55-5b38-a68a-bd8f91445781",
+                "config": {
+                  "displayName": "Moonset",
+                  "filterSelfPaths": true,
+                  "paths": {
+                    "gaugePath": {
+                      "description": "Date / Time",
+                      "path": "self.environment.moon.moonset",
+                      "source": "default",
+                      "pathType": "Date",
+                      "isPathConfigurable": true,
+                      "sampleTime": 1000
+                    }
+                  },
+                  "dateFormat": "HH:mm",
+                  "dateTimezone": "Europe/Helsinki",
+                  "color": "purple",
+                  "enableTimeout": false,
+                  "dataTimeout": 5
+                }
+              }
+            }
+          },
+          {
+            "x": 0,
+            "y": 18,
+            "w": 5,
+            "h": 6,
+            "id": "dea24504-0ccc-59cd-bdea-c33fb5e6032a",
+            "selector": "widget-host2",
+            "input": {
+              "widgetProperties": {
+                "type": "widget-datetime",
+                "uuid": "dea24504-0ccc-59cd-bdea-c33fb5e6032a",
+                "config": {
+                  "displayName": "Major Start",
+                  "filterSelfPaths": true,
+                  "paths": {
+                    "gaugePath": {
+                      "description": "Date / Time",
+                      "path": "self.environment.solunar.nextMajorStart",
+                      "source": "default",
+                      "pathType": "Date",
+                      "isPathConfigurable": true,
+                      "sampleTime": 1000
+                    }
+                  },
+                  "dateFormat": "HH:mm",
+                  "dateTimezone": "Europe/Helsinki",
+                  "color": "green",
+                  "enableTimeout": false,
+                  "dataTimeout": 5
+                }
+              }
+            }
+          },
+          {
+            "x": 5,
+            "y": 18,
+            "w": 5,
+            "h": 6,
+            "id": "2159c872-8bdf-5a43-97ad-e426c8bd97e9",
+            "selector": "widget-host2",
+            "input": {
+              "widgetProperties": {
+                "type": "widget-datetime",
+                "uuid": "2159c872-8bdf-5a43-97ad-e426c8bd97e9",
+                "config": {
+                  "displayName": "Major End",
+                  "filterSelfPaths": true,
+                  "paths": {
+                    "gaugePath": {
+                      "description": "Date / Time",
+                      "path": "self.environment.solunar.nextMajorEnd",
+                      "source": "default",
+                      "pathType": "Date",
+                      "isPathConfigurable": true,
+                      "sampleTime": 1000
+                    }
+                  },
+                  "dateFormat": "HH:mm",
+                  "dateTimezone": "Europe/Helsinki",
+                  "color": "green",
+                  "enableTimeout": false,
+                  "dataTimeout": 5
+                }
+              }
+            }
+          },
+          {
+            "x": 10,
+            "y": 18,
+            "w": 4,
+            "h": 6,
+            "id": "dd2806d3-6c6e-5589-b0ae-d8a23a117cee",
+            "selector": "widget-host2",
+            "input": {
+              "widgetProperties": {
+                "type": "widget-numeric",
+                "uuid": "dd2806d3-6c6e-5589-b0ae-d8a23a117cee",
+                "config": {
+                  "supportAutomaticHistoricalSeries": true,
+                  "displayName": "To Major",
+                  "filterSelfPaths": true,
+                  "paths": {
+                    "numericPath": {
+                      "description": "Numeric Data",
+                      "path": "self.environment.solunar.minutesToNextMajor",
+                      "source": "default",
+                      "pathType": "number",
+                      "suppressBootstrapNull": true,
+                      "isPathConfigurable": true,
+                      "convertUnitTo": "min",
+                      "showPathSkUnitsFilter": true,
+                      "pathSkUnitsFilter": null,
+                      "sampleTime": 500
+                    }
+                  },
+                  "showMax": false,
+                  "showMin": false,
+                  "numDecimal": 0,
+                  "showMiniChart": false,
+                  "yScaleMin": 0,
+                  "yScaleMax": 720,
+                  "inverseYAxis": false,
+                  "verticalChart": false,
+                  "color": "green",
+                  "enableTimeout": false,
+                  "dataTimeout": 5,
+                  "ignoreZones": false
+                }
+              }
+            }
+          },
+          {
+            "x": 14,
+            "y": 18,
+            "w": 5,
+            "h": 6,
+            "id": "5dfb3d74-bd96-567c-896c-ba524f2100eb",
+            "selector": "widget-host2",
+            "input": {
+              "widgetProperties": {
+                "type": "widget-datetime",
+                "uuid": "5dfb3d74-bd96-567c-896c-ba524f2100eb",
+                "config": {
+                  "displayName": "Minor Start",
+                  "filterSelfPaths": true,
+                  "paths": {
+                    "gaugePath": {
+                      "description": "Date / Time",
+                      "path": "self.environment.solunar.nextMinorStart",
+                      "source": "default",
+                      "pathType": "Date",
+                      "isPathConfigurable": true,
+                      "sampleTime": 1000
+                    }
+                  },
+                  "dateFormat": "HH:mm",
+                  "dateTimezone": "Europe/Helsinki",
+                  "color": "blue",
+                  "enableTimeout": false,
+                  "dataTimeout": 5
+                }
+              }
+            }
+          },
+          {
+            "x": 19,
+            "y": 18,
+            "w": 5,
+            "h": 6,
+            "id": "cd472f16-2c21-55a2-bcc5-a461c887271c",
+            "selector": "widget-host2",
+            "input": {
+              "widgetProperties": {
+                "type": "widget-datetime",
+                "uuid": "cd472f16-2c21-55a2-bcc5-a461c887271c",
+                "config": {
+                  "displayName": "Minor End",
+                  "filterSelfPaths": true,
+                  "paths": {
+                    "gaugePath": {
+                      "description": "Date / Time",
+                      "path": "self.environment.solunar.nextMinorEnd",
+                      "source": "default",
+                      "pathType": "Date",
+                      "isPathConfigurable": true,
+                      "sampleTime": 1000
+                    }
+                  },
+                  "dateFormat": "HH:mm",
+                  "dateTimezone": "Europe/Helsinki",
+                  "color": "blue",
+                  "enableTimeout": false,
+                  "dataTimeout": 5
+                }
+              }
+            }
+          }
+        ],
+        "collapseSplitShell": false
       }
     ]
   }

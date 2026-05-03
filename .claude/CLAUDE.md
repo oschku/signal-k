@@ -103,20 +103,37 @@ Four dashboards generated from [scripts/build_kip_config.py](../scripts/build_ki
 
 | Dashboard  | Focus | Key widgets |
 |---|---|---|
-| Underway   | planing / cruising      | RPM radial 0–7000, SOG, prop slip, fuel %, coolant, voltage, trim, hours, fuel rate, **Refilled** button |
-| Trolling   | low-speed fishing       | big precise SOG (1 dec), COG compass, 10 min SOG chart, position, RPM, trim, fuel % |
-| Navigation | passage planning        | COG compass, position, SOG, 30 min SOG chart, local clock, voltage, heading |
-| Engine     | diagnostics + slippage  | prop slip %, slip 30 min chart, RPM/fuel rate/coolant history, voltage, hours, fuel L |
+| Cruising   | planing speed at-a-glance | RPM radial 0–7000, SOG + minichart, coolant, fuel %, voltage, fuel hours, trim, engine hours, fuel rate, **Refilled** button |
+| Trolling   | low-speed lure control    | big SOG (1 dec) with min/max, COG compass, 10 min SOG chart, position, RPM, trim, fuel %, range |
+| Statistics | efficiency + diagnostics  | prop slip %, economy nm/L, slip / fuel rate / coolant / SOG / RPM charts, time left, range, fuel L, hours |
+| Fishing    | solunar fishing windows   | rating radial 0–4, phase name, illumination %, active period, sunrise/sunset/moonrise/moonset clocks, next major + minor start/end + minutes-to-next |
 
-History is captured via dataSets (defined in `app.dataSets`) for SOG, RPM, fuel
-rate, coolant, voltage, slip, fuel remaining. Periods are tuned per metric
-(e.g. fuel rate over 1 h, slip over 30 min).
+History is captured via dataSets in `app.dataSets`. Each chart widget needs a
+matching dataset whose `path|convertUnitTo|source|scale|period` line up
+exactly — KIP looks them up by tuple. Numeric/gauge widgets that have a
+minichart get an automatic `simple-chart-<uuid>` dataset created at runtime
+(via `supportAutomaticHistoricalSeries: true`) — these don't need to be
+pre-listed.
 
 **Regenerate** after editing `scripts/build_kip_config.py`:
 ```bash
-python3 scripts/build_kip_config.py    # rewrites signalk-config/applicationData/users/admin/kip/11.0.0.json
+python3 scripts/build_kip_config.py    # rewrites signalk-config/applicationData/users/panasonic/kip/11.0.0.json
 ```
 KIP requires a hard browser refresh to pick up server-side config changes.
+
+### KIP widget gotchas (lessons from prior breakage)
+- **Boolean-switch** (e.g. the Refilled button) takes a `paths` ARRAY with
+  `pathID` plus a parallel `multiChildCtrls` array — NOT `paths.statePath`.
+  The flag is `putEnable`, not `putEnabled`.
+- **Numeric / gauge / simple-linear** widgets need `supportAutomaticHistoricalSeries: true`
+  (otherwise minicharts stay blank) and path `suppressBootstrapNull: true`
+  (otherwise widgets show 0 before the first sample arrives).
+- **Chart datasets** match by tuple `(path, convertUnitTo, source, timeScale, period)`;
+  the `label` is rebuilt by KIP as `path|convertUnitTo|source|scale|period`
+  and any drift between widget config and dataset entry breaks history.
+- **String values** (moon phase name, solunar rating name, ISO timestamps)
+  need `widget-text` (paths.stringPath, pathType "string") or `widget-datetime`
+  (paths.gaugePath, pathType "Date") — not `widget-numeric`.
 
 ### Day / night theme
 - `app.autoNightMode: true` — auto-flips at sunset/sunrise based on `navigation.position`.
@@ -128,19 +145,25 @@ KIP requires a hard browser refresh to pick up server-side config changes.
 
 ## Custom plugins
 
-Both plugins live under [plugins/](../plugins/) and are wired into
+All custom plugins live under [plugins/](../plugins/) and are wired into
 `signalk-config/package.json` as relative-path deps:
 
 ```json
 "signalk-fuel-monitor": "file:../plugins/signalk-fuel-monitor",
-"signalk-slippage":     "file:../plugins/signalk-slippage"
+"signalk-slippage":     "file:../plugins/signalk-slippage",
+"signalk-solunar":      "file:../plugins/signalk-solunar"
 ```
 
-A plain `npm install` from `signalk-config/` puts both into `node_modules/`,
+A plain `npm install` from `signalk-config/` puts each into `node_modules/`,
 which is where Signal K's plugin-discovery code looks (per
 [Publishing to the AppStore](https://demo.signalk.org/documentation/Developing/Plugins/Publishing_to_The_AppStore.html)
 the `signalk-node-server-plugin` keyword is what makes the package eligible).
 Then enable each in **Server → Plugin Config**.
+
+Note: because npm symlinks `file:` deps, plugins with their own npm
+dependencies (e.g. `signalk-solunar` → `suncalc`) need a `npm install` inside
+the plugin directory itself so Node can resolve the deps from the plugin's
+real path.
 
 ### signalk-slippage ([plugins/signalk-slippage/](../plugins/signalk-slippage/))
 
@@ -176,6 +199,35 @@ Range/economy outputs are suppressed below configurable rate (`minFuelRateLph`,
 default 0.5 L/h) and SOG (`minSogKnots`, default 0.5 kn) thresholds.
 
 State persists to the plugin data dir so the estimate survives restarts.
+
+### signalk-solunar ([plugins/signalk-solunar/](../plugins/signalk-solunar/))
+
+Computes sunrise/sunset, moon phase + illumination, and solunar major/minor
+fishing periods for the boat's current position. Subscribes to
+`navigation.position` (with a Helsinki Harmaja fallback until a fix arrives)
+and publishes under `environment.sun.*`, `environment.moon.*`, and
+`environment.solunar.*`.
+
+| Path | Type | Notes |
+|---|---|---|
+| `environment.sun.sunrise` / `.sunset` / `.solarNoon` / `.dawn` / `.dusk` | ISO date | Today's events |
+| `environment.moon.moonrise` / `.moonset` | ISO date | Today's events |
+| `environment.moon.phase` | ratio 0..1 | 0/1 = new, 0.5 = full |
+| `environment.moon.phaseName` | string | "Full Moon", "Waxing Crescent", … |
+| `environment.moon.illumination` | ratio 0..1 | Lit fraction of the disc |
+| `environment.solunar.rating` | 0..4 | Day fishing rating |
+| `environment.solunar.ratingName` | string | "Excellent" / "Good" / "Average" / … |
+| `environment.solunar.activeKind` | string | `major` / `minor` / `none` right now |
+| `environment.solunar.nextMajorStart` / `.nextMajorEnd` | ISO date | Next major fishing window |
+| `environment.solunar.nextMinorStart` / `.nextMinorEnd` | ISO date | Next minor fishing window |
+| `environment.solunar.minutesToNextMajor` / `.minutesToNextMinor` | min | Countdown to next start |
+| `environment.solunar.majorPeriods` / `.minorPeriods` | array | All `{kind,centre,start,end}` windows over a 72 h horizon |
+
+Major periods are ±60 min around moon upper/lower transit (overhead /
+underfoot); minor periods are ±30 min around moonrise/moonset. Transits are
+located by sampling moon altitude every 5 min over 72 h. Full astronomy
+recompute fires when local date rolls over or position moves > 25 km; the
+"active"/"next" outputs refresh every 60 s.
 
 Refill handlers (PUT) — pick whichever the UI uses:
 - `tanks.fuel.0.refill` — any truthy value resets to capacity (the KIP
