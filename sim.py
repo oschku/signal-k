@@ -45,6 +45,33 @@ TCP_PORT = 10111
 N2K_SRC = 23  # arbitrary source-address byte to identify our virtual gateway
 
 
+# ─── Performance lookup tables ──────────────────────────────────────────────
+# Measured on a Tohatsu MFS30D (same engine family as MFS30DETL) installed on
+# a 420 Stessco Catcher — the closest publicly available real-world dataset.
+# The planing transition at ~3300→4000 RPM (7.3→13.5 kn) cannot be captured
+# by any simple formula; a lookup table is the only accurate approach.
+#
+# Below 700 RPM (idle-in-neutral approximation) both speed and fuel are near
+# zero. Above 6400 RPM values are clamped.
+
+_RPM_KTS = [700,  1000, 1500, 2000, 2500, 3300, 4000,  4500,  5000,  5500,  6000,  6400]
+_SOG_KN  = [0.5,  3.2,  4.1,  4.6,  5.4,  7.3,  13.5,  15.1,  19.4,  22.4,  24.6,  27.6]
+_LPH     = [0.3,  0.7,  1.1,  1.7,  2.4,  4.3,  6.2,   6.9,   7.3,   9.0,   10.6,  10.9]
+
+
+def _interp(x: float, xs: list, ys: list) -> float:
+    """Piecewise linear interpolation, clamped to table bounds."""
+    if x <= xs[0]:
+        return ys[0]
+    if x >= xs[-1]:
+        return ys[-1]
+    for i in range(len(xs) - 1):
+        if xs[i] <= x <= xs[i + 1]:
+            t = (x - xs[i]) / (xs[i + 1] - xs[i])
+            return ys[i] + t * (ys[i + 1] - ys[i])
+    return ys[-1]
+
+
 # ─── N2K binary PGN encoders ────────────────────────────────────────────────
 # All multi-byte fields are little-endian. Resolutions and N/A sentinels match
 # the canboat PGN definitions consumed by signalk-server -> canboatjs.
@@ -175,20 +202,18 @@ class BoatSim:
         else:
             rpm = 1000
 
-        fuel_rate_lph = 0.4 + 0.000125 * (rpm ** 1.3) # 0.5 L/h at idle, 10.5 L/h at WOT
+        fuel_rate_lph = _interp(rpm, _RPM_KTS, _LPH)
 
         # Coolant: exponential approach to a load-dependent equilibrium.
-        # Each 1-second tick: T += (T_eq - T) × (1 − e^(−dt/τ))
-        # This gives a rapid rise from cold, gradually slowing near operating temp.
         t_eq = 58.0 + 26.0 * (rpm / 7000.0)
-        alpha = 1.0 - math.exp(-1.0 / self.COOLANT_TAU_S)  # ≈ 0.00664 per tick
+        alpha = 1.0 - math.exp(-1.0 / self.COOLANT_TAU_S)
         self.coolant_c += (t_eq - self.coolant_c) * alpha
         coolant_c = self.coolant_c
 
         trim_pct = 35 + 10 * math.sin(self.t / 60)
         voltage = 14.2 if rpm > 800 else 12.6
 
-        sog_knots = max(0, (rpm - 900) / 200)
+        sog_knots = _interp(rpm, _RPM_KTS, _SOG_KN)
         sog_ms = sog_knots * 0.5144
 
         self.lat += (sog_ms * math.cos(math.radians(self.heading_deg))) / 111000

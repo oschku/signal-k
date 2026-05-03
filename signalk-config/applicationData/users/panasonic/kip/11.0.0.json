@@ -19,26 +19,6 @@
           "editable": false
         },
         {
-          "uuid": "c1c47638-03a3-5fe1-ad95-97f01fa569ad",
-          "path": "self.propulsion.port.slip",
-          "pathSource": "default",
-          "baseUnit": "ratio",
-          "timeScaleFormat": "minute",
-          "period": 0.2,
-          "label": "simple-chart-c1c47638-03a3-5fe1-ad95-97f01fa569ad",
-          "editable": false
-        },
-        {
-          "uuid": "817ae746-b672-5ff2-a3e3-f20bc157db25",
-          "path": "self.tanks.fuel.0.distancePerFuel",
-          "pathSource": "default",
-          "baseUnit": "m/m3",
-          "timeScaleFormat": "minute",
-          "period": 0.2,
-          "label": "simple-chart-817ae746-b672-5ff2-a3e3-f20bc157db25",
-          "editable": false
-        },
-        {
           "uuid": "bf00ace2-f199-5f86-bcb9-28c254ac07ef",
           "path": "self.propulsion.port.slip",
           "pathSource": "default",
@@ -86,6 +66,36 @@
           "timeScaleFormat": "minute",
           "period": 30,
           "label": "self.propulsion.port.revolutions|rpm|default|minute|30",
+          "editable": false
+        },
+        {
+          "uuid": "d6a88b94-4bb5-4628-a9bb-23beea07a4e5",
+          "path": "self.navigation.speedOverGround",
+          "pathSource": "default",
+          "baseUnit": "m/s",
+          "timeScaleFormat": "minute",
+          "period": 0.2,
+          "label": "simple-chart-d6a88b94-4bb5-4628-a9bb-23beea07a4e5",
+          "editable": false
+        },
+        {
+          "uuid": "1ab6cbd9-4713-578c-86fd-e6f17cdf9700",
+          "path": "self.tanks.fuel.0.timeRange",
+          "pathSource": "default",
+          "baseUnit": "s",
+          "timeScaleFormat": "minute",
+          "period": 0.2,
+          "label": "simple-chart-1ab6cbd9-4713-578c-86fd-e6f17cdf9700",
+          "editable": false
+        },
+        {
+          "uuid": "7717da33-e829-4bad-b6d3-92bfc81edb9f",
+          "path": "self.tanks.fuel.0.distancePerFuel",
+          "pathSource": "default",
+          "baseUnit": "m/m3",
+          "timeScaleFormat": "minute",
+          "period": 10,
+          "label": "self.tanks.fuel.0.distancePerFuel|nm/l|default|minute|10",
           "editable": false
         }
       ],
@@ -206,7 +216,7 @@
             "x": 13,
             "y": 0,
             "w": 8,
-            "h": 15,
+            "h": 10,
             "minW": 1,
             "minH": 2,
             "id": "d6a88b94-4bb5-4628-a9bb-23beea07a4e5",
@@ -236,7 +246,7 @@
                   "showMax": true,
                   "showMin": false,
                   "numDecimal": 1,
-                  "showMiniChart": false,
+                  "showMiniChart": true,
                   "yScaleMin": 0,
                   "yScaleMax": 24,
                   "inverseYAxis": false,
@@ -304,45 +314,46 @@
           },
           {
             "x": 13,
-            "y": 15,
+            "y": 10,
             "w": 8,
-            "h": 5,
-            "id": "1ab6cbd9-4713-578c-86fd-e6f17cdf9700",
+            "h": 7,
+            "minW": 2,
+            "minH": 3,
+            "id": "7717da33-e829-4bad-b6d3-92bfc81edb9f",
             "selector": "widget-host2",
             "input": {
               "widgetProperties": {
-                "type": "widget-numeric",
-                "uuid": "1ab6cbd9-4713-578c-86fd-e6f17cdf9700",
+                "type": "widget-data-chart",
+                "uuid": "7717da33-e829-4bad-b6d3-92bfc81edb9f",
                 "config": {
-                  "supportAutomaticHistoricalSeries": true,
-                  "displayName": "Fuel Hours",
+                  "displayName": "Efficiency (10 min)",
+                  "color": "blue",
                   "filterSelfPaths": true,
-                  "paths": {
-                    "numericPath": {
-                      "description": "Numeric Data",
-                      "path": "self.tanks.fuel.0.timeRange",
-                      "source": "default",
-                      "pathType": "number",
-                      "suppressBootstrapNull": true,
-                      "isPathConfigurable": true,
-                      "convertUnitTo": "Hours",
-                      "showPathSkUnitsFilter": true,
-                      "pathSkUnitsFilter": null,
-                      "sampleTime": 500
-                    }
-                  },
-                  "showMax": false,
-                  "showMin": false,
+                  "datachartPath": "self.tanks.fuel.0.distancePerFuel",
+                  "datachartSource": "default",
+                  "convertUnitTo": "nm/l",
+                  "timeScale": "minute",
+                  "period": 10,
                   "numDecimal": 1,
-                  "showMiniChart": true,
-                  "yScaleMin": 0,
-                  "yScaleMax": 5,
                   "inverseYAxis": false,
+                  "datasetAverageArray": "sma",
+                  "showDataPoints": false,
+                  "showAverageData": true,
+                  "trackAgainstAverage": false,
+                  "showDatasetMinimumValueLine": false,
+                  "showDatasetMaximumValueLine": true,
+                  "showDatasetAverageValueLine": false,
+                  "showDatasetAngleAverageValueLine": false,
+                  "showLabel": true,
+                  "showTimeScale": false,
+                  "startScaleAtZero": false,
                   "verticalChart": false,
-                  "color": "green",
-                  "enableTimeout": false,
-                  "dataTimeout": 5,
-                  "ignoreZones": false
+                  "showYScale": true,
+                  "yScaleSuggestedMin": 0,
+                  "yScaleSuggestedMax": null,
+                  "enableMinMaxScaleLimit": false,
+                  "yScaleMin": null,
+                  "yScaleMax": null
                 }
               }
             }
@@ -407,24 +418,24 @@
                 "uuid": "46c4afe8-8fc5-5ed6-9ed3-272a8debf83c",
                 "config": {
                   "supportAutomaticHistoricalSeries": true,
-                  "displayName": "Voltage",
+                  "displayName": "Coolant",
                   "filterSelfPaths": true,
                   "paths": {
                     "gaugePath": {
                       "description": "Numeric Data",
-                      "path": "self.electrical.batteries.0.voltage",
+                      "path": "self.propulsion.port.temperature",
                       "source": "default",
                       "pathType": "number",
                       "isPathConfigurable": true,
                       "showPathSkUnitsFilter": true,
                       "pathSkUnitsFilter": null,
-                      "convertUnitTo": "V",
+                      "convertUnitTo": "celsius",
                       "sampleTime": 500
                     }
                   },
                   "displayScale": {
-                    "lower": 10,
-                    "upper": 15,
+                    "lower": 20,
+                    "upper": 80,
                     "type": "linear"
                   },
                   "gauge": {
@@ -432,11 +443,56 @@
                     "unitLabelFormat": "full"
                   },
                   "numInt": 1,
-                  "numDecimal": 2,
+                  "numDecimal": 0,
                   "ignoreZones": false,
-                  "color": "green",
+                  "color": "orange",
                   "enableTimeout": false,
                   "dataTimeout": 5
+                }
+              }
+            }
+          },
+          {
+            "x": 13,
+            "y": 17,
+            "w": 8,
+            "h": 3,
+            "id": "1ab6cbd9-4713-578c-86fd-e6f17cdf9700",
+            "selector": "widget-host2",
+            "input": {
+              "widgetProperties": {
+                "type": "widget-numeric",
+                "uuid": "1ab6cbd9-4713-578c-86fd-e6f17cdf9700",
+                "config": {
+                  "supportAutomaticHistoricalSeries": true,
+                  "displayName": "Fuel Hours",
+                  "filterSelfPaths": true,
+                  "paths": {
+                    "numericPath": {
+                      "description": "Numeric Data",
+                      "path": "self.tanks.fuel.0.timeRange",
+                      "source": "default",
+                      "pathType": "number",
+                      "suppressBootstrapNull": true,
+                      "isPathConfigurable": true,
+                      "convertUnitTo": "Hours",
+                      "showPathSkUnitsFilter": true,
+                      "pathSkUnitsFilter": null,
+                      "sampleTime": 500
+                    }
+                  },
+                  "showMax": false,
+                  "showMin": false,
+                  "numDecimal": 1,
+                  "showMiniChart": true,
+                  "yScaleMin": 0,
+                  "yScaleMax": 4,
+                  "inverseYAxis": false,
+                  "verticalChart": true,
+                  "color": "green",
+                  "enableTimeout": false,
+                  "dataTimeout": 5,
+                  "ignoreZones": false
                 }
               }
             }
@@ -589,7 +645,7 @@
                 "uuid": "b5f2fafb-ae34-5a39-bded-b89847a0ac82",
                 "config": {
                   "supportAutomaticHistoricalSeries": true,
-                  "displayName": "Hours",
+                  "displayName": "Engine Hours",
                   "filterSelfPaths": true,
                   "paths": {
                     "numericPath": {
