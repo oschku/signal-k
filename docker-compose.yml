@@ -1,6 +1,19 @@
 version: '3.8'
 
 services:
+  # Tohatsu/ESP32-gateway simulator (dev profile only — on the boat the real
+  # WiFi gateway plays this role, so this service is excluded from the
+  # default `docker compose up`. Run dev stack with `--profile dev`.)
+  sim:
+    build:
+      context: .
+      dockerfile: Dockerfile.sim
+    container_name: boat-sim
+    restart: unless-stopped
+    profiles: ["dev"]
+    networks:
+      - boat-network
+
   # Signal K Server - marine data hub
   signalk:
     build:
@@ -11,8 +24,6 @@ services:
     ports:
       - "3000:3000"      # Web UI and API
       - "3858:3858"      # WebSocket stream
-    environment:
-      - SIGNALK_NODE_SETTINGS=/home/node/project/signalk-config/settings.json
     networks:
       - boat-network
     depends_on:

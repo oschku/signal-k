@@ -1,0 +1,9 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+COPY sim.py /app/sim.py
+
+EXPOSE 10111
+
+ENTRYPOINT ["python3", "-u", "sim.py"]
+CMD ["--scenario", "cruise", "--port", "10111"]
