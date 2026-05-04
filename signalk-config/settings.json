@@ -11,7 +11,7 @@
             "type": "NMEA0183",
             "subOptions": {
               "type": "tcp",
-              "host": "localhost",
+              "host": "host.docker.internal",
               "port": "10111"
             }
           }

@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  # Signal K Server - marine data hub
+  signalk:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: boat-signalk
+    restart: unless-stopped
+    ports:
+      - "3000:3000"      # Web UI and API
+      - "3858:3858"      # WebSocket stream
+    environment:
+      - SIGNALK_NODE_SETTINGS=/home/node/project/signalk-config/settings.json
+    networks:
+      - boat-network
+    depends_on:
+      - influxdb
+
+  # InfluxDB 2.x - time-series database
+  influxdb:
+    image: influxdb:2.7
+    container_name: boat-influxdb
+    restart: unless-stopped
+    ports:
+      - "8086:8086"
+    volumes:
+      - influxdb-data:/var/lib/influxdb2
+      - influxdb-config:/etc/influxdb2
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=changeme-use-strong-password
+      - DOCKER_INFLUXDB_INIT_ORG=boat-data
+      - DOCKER_INFLUXDB_INIT_BUCKET=signalk
+      - DOCKER_INFLUXDB_INIT_RETENTION=90d
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-super-secret-auth-token-change-this
+    networks:
+      - boat-network
+
+  # Grafana - visualization and dashboards
+  grafana:
+    image: grafana/grafana:latest
+    container_name: boat-grafana
+    restart: unless-stopped
+    ports:
+      - "3001:3000"      # Grafana UI (avoiding conflict with Signal K port 3000)
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=changeme-use-strong-password
+      - GF_SERVER_ROOT_URL=http://localhost:3001
+      - GF_INSTALL_PLUGINS=
+    networks:
+      - boat-network
+    depends_on:
+      - influxdb
+
+  # Optional: Portainer for container management UI
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: boat-portainer
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer-data:/data
+    networks:
+      - boat-network
+
+networks:
+  boat-network:
+    driver: bridge
+
+volumes:
+  influxdb-data:
+  influxdb-config:
+  grafana-data:
+  portainer-data:
