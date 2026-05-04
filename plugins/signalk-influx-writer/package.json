@@ -1,0 +1,15 @@
+{
+  "name": "signalk-influx-writer",
+  "version": "0.1.0",
+  "description": "Stream Signal K deltas (numeric, boolean, position, short strings) to InfluxDB v2 for time-series storage and Grafana analysis.",
+  "main": "index.js",
+  "keywords": [
+    "signalk-node-server-plugin",
+    "signalk-category-utility"
+  ],
+  "author": "Quicksilver 410 build",
+  "license": "MIT",
+  "dependencies": {
+    "@influxdata/influxdb-client": "^1.35.0"
+  }
+}

@@ -14,6 +14,7 @@
     "signalk-dashboard": "^0.4.6",
     "signalk-derived-data": "^1.44.1",
     "signalk-fuel-monitor": "file:../plugins/signalk-fuel-monitor",
+    "signalk-influx-writer": "file:../plugins/signalk-influx-writer",
     "signalk-n2kais-to-nmea0183": "^2.0.3",
     "signalk-net-weather-finland": "^1.0.0",
     "signalk-slippage": "file:../plugins/signalk-slippage",
