@@ -22,10 +22,13 @@
  */
 
 const SunCalc = require("suncalc");
+const { InfluxDB, Point } = require("@influxdata/influxdb-client");
 
 const MS_PER_MIN = 60_000;
 const MS_PER_HOUR = 3_600_000;
 const MS_PER_DAY = 86_400_000;
+const FORECAST_HOURS = 168;          // 7 days of hourly forecast
+const FORECAST_REWRITE_MS = 60 * 60 * 1000;  // refresh forecast hourly
 
 // Solunar window half-widths
 const MAJOR_HALF_MIN = 60;   // ±60 min around moon transit  (2 h major)
@@ -89,6 +92,28 @@ module.exports = function (app) {
         description:
           "Force a full astronomy recompute when position has moved by this much.",
         default: 25,
+      },
+      influxUrl: {
+        type: "string",
+        title: "InfluxDB URL (forecast write target)",
+        description:
+          "Leave empty to disable forecast writes. When set, an hourly fishing-score forecast over the next 168 h is written to the bucket below.",
+        default: "http://influxdb:8086",
+      },
+      influxToken: {
+        type: "string",
+        title: "InfluxDB token",
+        default: "",
+      },
+      influxOrg: {
+        type: "string",
+        title: "InfluxDB organisation",
+        default: "boat-data",
+      },
+      influxBucket: {
+        type: "string",
+        title: "InfluxDB bucket",
+        default: "signalk",
       },
     },
   };
@@ -396,6 +421,157 @@ module.exports = function (app) {
     });
   }
 
+  // ─── Forecast (hourly score over 168 h, written to InfluxDB) ───────────
+
+  /**
+   * Hourly fishing score for a given moment. Combines:
+   *   - daily rating (slow-changing, phase-driven 0..4)
+   *   - +1.5 if inside a major period
+   *   - +0.75 if inside a minor period
+   *   - +0.75 if within ±60 min of sunrise or sunset
+   *
+   * Capped at 4. Independent of the daily-rating-only metric, so a poor day
+   * can still have a few hours that bump above average if all stars align.
+   */
+  function scoreAt(t, dailyRating, majors, minors, sun) {
+    const ms = t.getTime();
+    const within = (centreIso, halfMs) => {
+      if (!centreIso) return false;
+      const c = new Date(centreIso).getTime();
+      return Math.abs(ms - c) <= halfMs;
+    };
+
+    const inMajor = majors.some(
+      (p) => ms >= new Date(p.start).getTime() && ms < new Date(p.end).getTime(),
+    );
+    const inMinor = minors.some(
+      (p) => ms >= new Date(p.start).getTime() && ms < new Date(p.end).getTime(),
+    );
+    const sunWindow = SUN_OVERLAP_MIN * MS_PER_MIN;
+    const nearSun =
+      within(sun.sunrise, sunWindow) || within(sun.sunset, sunWindow);
+
+    let score = dailyRating * 0.5;       // 0..2 from daily phase quality
+    if (inMajor) score += 1.5;
+    if (inMinor) score += 0.75;
+    if (nearSun) score += 0.75;
+    return {
+      score: Math.max(0, Math.min(4, score)),
+      inMajor: inMajor ? 1 : 0,
+      inMinor: inMinor ? 1 : 0,
+      nearSun: nearSun ? 1 : 0,
+    };
+  }
+
+  /**
+   * Compute hourly forecast over `hours` from `start`. We pre-compute one
+   * big set of moon transits over the full range and per-day sun events so
+   * the per-hour loop is cheap.
+   */
+  function computeForecast(start, hours, lat, lon) {
+    const transits = findMoonTransits(start, hours, lat, lon);
+    const majors = transits.map((t) =>
+      makeWindow(t.time, MAJOR_HALF_MIN, t.kind === "upper" ? "major-overhead" : "major-underfoot"),
+    ).filter(Boolean);
+
+    const minors = [];
+    const sunByDate = new Map();
+    const dailyByDate = new Map();
+    const days = Math.ceil(hours / 24) + 1;
+    for (let d = 0; d <= days; d++) {
+      const dayDate = new Date(start.getTime() + d * MS_PER_DAY);
+      const dayKey = localDateKey(dayDate);
+      const sun = SunCalc.getTimes(dayDate, lat, lon);
+      const moon = SunCalc.getMoonTimes(dayDate, lat, lon, true);
+      sunByDate.set(dayKey, sun);
+      if (moon.rise) minors.push(makeWindow(moon.rise, MINOR_HALF_MIN, "minor-rise"));
+      if (moon.set)  minors.push(makeWindow(moon.set,  MINOR_HALF_MIN, "minor-set"));
+
+      // Cache daily rating: compute once per day using the noon point as ref.
+      const noon = new Date(dayDate);
+      noon.setHours(12, 0, 0, 0);
+      const moonIllum = SunCalc.getMoonIllumination(noon);
+      const phaseScore = Math.cos(2 * Math.PI * 2 * moonIllum.phase) * 0.5 + 0.5;
+      const window = SUN_OVERLAP_MIN * MS_PER_MIN + MAJOR_HALF_MIN * MS_PER_MIN;
+      const dayMidnight = localMidnight(dayDate).getTime();
+      const todayMajors = majors.filter((p) => {
+        const c = new Date(p.centre).getTime();
+        return c >= dayMidnight && c < dayMidnight + MS_PER_DAY;
+      });
+      const sunBonus = todayMajors.some((p) => {
+        const c = new Date(p.centre).getTime();
+        return (
+          (sun.sunrise && Math.abs(c - sun.sunrise.getTime()) <= window) ||
+          (sun.sunset  && Math.abs(c - sun.sunset.getTime())  <= window)
+        );
+      }) ? 1 : 0;
+      dailyByDate.set(dayKey, Math.max(0, Math.min(4, phaseScore * 3 + sunBonus)));
+    }
+
+    const points = [];
+    for (let h = 0; h < hours; h++) {
+      const t = new Date(start.getTime() + h * MS_PER_HOUR);
+      const dayKey = localDateKey(t);
+      const dailyRating = dailyByDate.get(dayKey) ?? 0;
+      const sun = sunByDate.get(dayKey) ?? {};
+      const s = scoreAt(t, dailyRating, majors, minors, sun);
+      points.push({ time: t, dailyRating, ...s });
+    }
+    return points;
+  }
+
+  let influxClient = null;
+  let influxWriteApi = null;
+  let lastForecastWrite = 0;
+
+  function setupInflux() {
+    if (!opts.influxUrl || !opts.influxToken) {
+      app.debug("solunar forecast: InfluxDB not configured, skipping forecast writes");
+      return;
+    }
+    try {
+      influxClient = new InfluxDB({ url: opts.influxUrl, token: opts.influxToken });
+      influxWriteApi = influxClient.getWriteApi(opts.influxOrg, opts.influxBucket, "ms", {
+        batchSize: 200,
+        flushInterval: 5000,
+        maxRetries: 3,
+      });
+      app.debug(
+        `solunar forecast: writing to ${opts.influxUrl} ${opts.influxOrg}/${opts.influxBucket}`,
+      );
+    } catch (err) {
+      app.error(`solunar forecast: InfluxDB init failed: ${err.message}`);
+      influxWriteApi = null;
+    }
+  }
+
+  function writeForecast(now) {
+    if (!influxWriteApi) return;
+    const lat = lastPosition?.latitude ?? opts.defaultLatitude;
+    const lon = lastPosition?.longitude ?? opts.defaultLongitude;
+    const start = new Date(now.getTime() - now.getTime() % MS_PER_HOUR);  // round down to hour
+
+    const forecast = computeForecast(start, FORECAST_HOURS, lat, lon);
+    const latTag = lat.toFixed(2);
+    const lonTag = lon.toFixed(2);
+
+    for (const p of forecast) {
+      const point = new Point("solunar.forecast")
+        .tag("lat", latTag)
+        .tag("lon", lonTag)
+        .floatField("score", p.score)
+        .floatField("dailyRating", p.dailyRating)
+        .intField("inMajor", p.inMajor)
+        .intField("inMinor", p.inMinor)
+        .intField("nearSun", p.nearSun)
+        .timestamp(p.time);
+      influxWriteApi.writePoint(point);
+    }
+    influxWriteApi.flush().catch((err) => app.error(`solunar forecast flush: ${err.message}`));
+    lastForecastWrite = now.getTime();
+    app.debug(`solunar forecast: wrote ${forecast.length} hourly points to InfluxDB`);
+  }
+
   // ─── Main loop ──────────────────────────────────────────────────────────
 
   function ensureFresh(now) {
@@ -420,6 +596,9 @@ module.exports = function (app) {
     const now = new Date();
     ensureFresh(now);
     emitAll(now);
+    if (influxWriteApi && now.getTime() - lastForecastWrite >= FORECAST_REWRITE_MS) {
+      writeForecast(now);
+    }
   }
 
   plugin.start = function (options) {
@@ -429,6 +608,10 @@ module.exports = function (app) {
       defaultLongitude: options.defaultLongitude ?? 24.98,
       tickSeconds: Math.max(10, options.tickSeconds ?? 60),
       positionMoveKm: options.positionMoveKm ?? 25,
+      influxUrl: options.influxUrl ?? "",
+      influxToken: options.influxToken ?? "",
+      influxOrg: options.influxOrg ?? "boat-data",
+      influxBucket: options.influxBucket ?? "signalk",
     };
 
     app.debug(
@@ -436,6 +619,7 @@ module.exports = function (app) {
     );
 
     emitMeta();
+    setupInflux();
 
     app.subscriptionmanager.subscribe(
       {
@@ -475,9 +659,16 @@ module.exports = function (app) {
     unsubscribes = [];
     if (tickTimer) clearInterval(tickTimer);
     tickTimer = null;
+    if (influxWriteApi) {
+      const w = influxWriteApi;
+      influxWriteApi = null;
+      w.close().catch((err) => app.error(`solunar forecast close: ${err.message}`));
+    }
+    influxClient = null;
     cache = null;
     computedFor = null;
     lastPosition = null;
+    lastForecastWrite = 0;
   };
 
   return plugin;

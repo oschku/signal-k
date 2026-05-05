@@ -40,6 +40,9 @@ RUN npm install --omit=dev
 WORKDIR /home/node/plugins/signalk-influx-writer
 RUN npm install --omit=dev
 
+WORKDIR /home/node/plugins/signalk-weather-forecast
+RUN npm install --omit=dev
+
 # Install everything signalk-config/package.json declares — registry plugins
 # (KIP, freeboard-sk, derived-data, …) and file: symlinks to our plugins.
 WORKDIR /home/node/.signalk
@@ -53,9 +56,12 @@ RUN set -e && \
     test -e node_modules/signalk-slippage/package.json && \
     test -e node_modules/signalk-solunar/package.json && \
     test -e node_modules/signalk-influx-writer/package.json && \
+    test -e node_modules/signalk-weather-forecast/package.json && \
     echo "Verifying plugin internal deps..." && \
     test -e /home/node/plugins/signalk-solunar/node_modules/suncalc/package.json && \
+    test -e /home/node/plugins/signalk-solunar/node_modules/@influxdata/influxdb-client/package.json && \
     test -e /home/node/plugins/signalk-influx-writer/node_modules/@influxdata/influxdb-client/package.json && \
+    test -e /home/node/plugins/signalk-weather-forecast/node_modules/@influxdata/influxdb-client/package.json && \
     echo "Verifying registry plugins..." && \
     test -e node_modules/@mxtommy/kip/package.json && \
     test -e node_modules/@signalk/freeboard-sk/package.json && \

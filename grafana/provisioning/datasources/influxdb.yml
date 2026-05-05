@@ -1,0 +1,17 @@
+apiVersion: 1
+
+datasources:
+  - name: InfluxDB
+    uid: boat-influxdb
+    type: influxdb
+    access: proxy
+    url: http://influxdb:8086
+    isDefault: true
+    jsonData:
+      version: Flux
+      organization: boat-data
+      defaultBucket: signalk
+      tlsSkipVerify: true
+    secureJsonData:
+      token: my-super-secret-auth-token-change-this
+    editable: true

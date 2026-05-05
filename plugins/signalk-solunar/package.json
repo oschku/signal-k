@@ -7,6 +7,7 @@
   "author": "Quicksilver 410 build",
   "license": "MIT",
   "dependencies": {
+    "@influxdata/influxdb-client": "^1.35.0",
     "suncalc": "^1.9.0"
   }
 }

@@ -1,0 +1,15 @@
+{
+  "name": "signalk-weather-forecast",
+  "version": "0.1.0",
+  "description": "Hourly 7-day weather forecast (wind, clouds, temp, precip, pressure) from Open-Meteo, written to InfluxDB for Grafana dashboards.",
+  "main": "index.js",
+  "keywords": [
+    "signalk-node-server-plugin",
+    "signalk-category-derived-data"
+  ],
+  "author": "Quicksilver 410 build",
+  "license": "MIT",
+  "dependencies": {
+    "@influxdata/influxdb-client": "^1.35.0"
+  }
+}

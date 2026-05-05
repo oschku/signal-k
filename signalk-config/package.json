@@ -19,6 +19,7 @@
     "signalk-net-weather-finland": "^1.0.0",
     "signalk-slippage": "file:../plugins/signalk-slippage",
     "signalk-solunar": "file:../plugins/signalk-solunar",
-    "signalk-virtual-weather-sensors": "^1.2.2"
+    "signalk-virtual-weather-sensors": "^1.2.2",
+    "signalk-weather-forecast": "file:../plugins/signalk-weather-forecast"
   }
 }
